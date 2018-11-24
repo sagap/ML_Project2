@@ -8,7 +8,7 @@ def main():
         for idx, line in enumerate(f):
             vocab[line.strip()] = idx
 
-    with open('vocab.pkl', 'wb') as f:
+    with open('../twitter-datasets/vocab.pkl', 'wb') as f:
         pickle.dump(vocab, f, pickle.HIGHEST_PROTOCOL)
 
 
