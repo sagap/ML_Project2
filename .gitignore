@@ -1,3 +1,5 @@
 twitter-datasets/
 notes.txt
 src/.*
+src/__pycache__/
+src/.ipynb_checkpoints/*
