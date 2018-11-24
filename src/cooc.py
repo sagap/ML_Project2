@@ -5,7 +5,7 @@ import pickle
 
 
 def main():
-    with open('vocab.pkl', 'rb') as f:
+    with open('../twitter-datasets/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
     vocab_size = len(vocab)
 
