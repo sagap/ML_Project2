@@ -1,0 +1,62 @@
+-----0. General Info-----
+
+- : l
+- There are repeated tweets - //TODO: check this
+- All tweets have been tokenized already, so that the words and punctuation are properly separated by a whitespace.
+- the labels indicate if a tweet used to contain a :) or :( smiley. (1 or -1)
+- Allowed to use scikit-learn and external libraries
+- Each participant 5 submissions per day(10 per team). Wrong submission file format do not count.
+- Metric: Misclassification error score. Accuracy
+
+
+
+-----1. Preprocessing-----
+
+- No Preprocessing in the 1st run
+
+
+-----2. Text representation-----
+
+- Naive-first approach:
+  Load the training tweets and the built GloVe word embeddings. Using the word embeddings, construct a feature representation of each training tweet (by averaging the word vectors over all words of the tweet).
+
+
+
+
+-----3. Train a Linear Classifier----- 
+
+- 1. Logistic regression - scikit-learn
+- 2. SVM  - scikit-learn
+
+
+
+-----4. Prediction - Submission/Evaluation-----
+
+- Memory errors when run full dataset locally => need more powerful computer
+- Very important to build again accurate local testing
+- Experiment history. If we do not like a result the solution is to improve the model - not to avoid include it in the report
+
+
+
+----- Notes about the project---
+
+lemmatization and stemming)
+
+1. Preprocessing
+- contractions expansion: don't -> do (check if have been separated in the tokenization phase)
+- Emojis Transformation: check if we have
+- check if we have hashtags - if yes: split word
+- POS Tagging is it necessary? -> yes for lemmatization
+
+
+2. Text Representation
+- word embeddings
+- tweet embeddings
+- bag of words
+- pagraph embeddings
+
+3. ML algorithms
+- Naive bayes. should we??
+- FastText?
+- Neural Network (Convolutional) 
+- Validation: Particle Swarm Model Selection (PSO) ??
