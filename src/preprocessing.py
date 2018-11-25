@@ -37,3 +37,22 @@ def replace_elongated_word(word):
 def countElongated(text):
     """ Input: a text, Output: how many words are elongated """
     return len([word for word in text.split() if elongated_regex.search(word)])
+
+def remove_unnecessary(text):
+    return re.sub(r'<user>|<url>|\n', '', text)
+
+def replace_emoji(text):
+    rep_text = text
+    rep_text = re.sub('>:\)|>:D|>:-D|>;\)|>:-\)|}:-\)|}:\)|3:-\)|3:\)', ' devil ', rep_text)
+    rep_text = re.sub('O:-\)|0:-3|0:3|0:-\)|0:\)|0;^\)', ' angel ', rep_text)
+    rep_text = re.sub(':\)+|\(+:|:-\)+|\(+-:|:\}| c : ', ' happy ', rep_text)
+    # replace laugh icons with happy 
+    rep_text = re.sub(':-D|:D|=D|=-D|8-D|8D|x-D|xD|X-D|=-D|:d|:-d|>:d|=3|=-3|:\'-\)|:\'\)|\(\':|\[:|:\]| : \) ', ' happy ', rep_text)    
+    rep_text = re.sub('\)+:|:\(+|:-\(+|\)+-:|>:\[| : c |:\|', ' sad ', rep_text)
+    rep_text = re.sub(':[ ]*\*|:-\*+|:x|: - \*', ' kiss ', rep_text, flags=re.I)
+    rep_text = re.sub('<3', ' heart ', rep_text)
+    rep_text = re.sub(';-\)|;\)|\*\)|\*-\)|;-\]|;]|;D|;\^\)', ' wink ', rep_text)
+    rep_text = re.sub('>:P|:-P|:P|X-P|xp|=p|:b|:-b|;p| : p ', ' tongue ', rep_text, flags=re.I)
+    rep_text = re.sub('>:O|:-O|:O| : O|: - o', ' surprise ', rep_text, flags=re.I)
+    rep_text = re.sub(':-\||<:-\||>.<|:S|:\/|=\/|:\\\\| : - s ', ' skeptical ', rep_text)
+    return rep_text
