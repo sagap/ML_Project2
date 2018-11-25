@@ -3,3 +3,4 @@ notes.txt
 src/.*
 src/__pycache__/
 src/.ipynb_checkpoints/*
+src/.ipynb_checkpoints/test-checkpoint.ipynb
