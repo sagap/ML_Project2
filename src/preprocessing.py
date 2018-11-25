@@ -42,7 +42,7 @@ def remove_unnecessary(text):
     return re.sub(r'<user>|<url>|\n', '', text)
 
 def replace_emoji(text):
-    rep_text = text
+    rep_text = ' ' + text + ' '
     rep_text = re.sub('>:\)|>:D|>:-D|>;\)|>:-\)|}:-\)|}:\)|3:-\)|3:\)', ' devil ', rep_text)
     rep_text = re.sub('O:-\)|0:-3|0:3|0:-\)|0:\)|0;^\)', ' angel ', rep_text)
     rep_text = re.sub(':\)+|\(+:|:-\)+|\(+-:|:\}| c : ', ' happy ', rep_text)
@@ -56,3 +56,11 @@ def replace_emoji(text):
     rep_text = re.sub('>:O|:-O|:O| : O|: - o', ' surprise ', rep_text, flags=re.I)
     rep_text = re.sub(':-\||<:-\||>.<|:S|:\/|=\/|:\\\\| : - s ', ' skeptical ', rep_text)
     return rep_text
+
+def replace_numbers(text):
+    return re.sub('[-+:\*\\\\/x#]?[0-9]+', ' number ', text)
+
+def write_file(_list, filename):
+    with open('../twitter-datasets/{file}.txt'.format(file=filename), 'w') as f_out:
+        for line in _list:
+            f_out.write("%s\n" % line.strip())
