@@ -2,6 +2,8 @@
 import re
 import helpers
 from nltk.corpus import wordnet
+from nltk.stem.porter import PorterStemmer
+
 
 #create contractions dictionary
 contractions = helpers.create_dict_from_csv('utils/contractions.csv')
@@ -22,6 +24,11 @@ def is_elongated(word):
     ''' function that checks if a word is elongated'''
     return elongated_regex.search(word) != None
     
+def replace_elongated(line):
+    ''' function that takes a line as input and checks for elongated words'''
+    fixed_tweet = [replace_elongated_word(word) for word in line.split()]
+    return ' '.join(fixed_tweet)    
+
 def replace_elongated_word(word):
     ''' function that provided an elongated word, returns its proper form
         based on wordnet of nltk to find the proper word without elongation
@@ -59,3 +66,8 @@ def replace_emoji(text):
 
 def replace_numbers(text):
     return re.sub('[-+:\*\\\\/x#]?[0-9]+', ' ', text)
+
+def stemming_using_Porter(text):
+    '''function that uses PorterStemmer on a list of tweets'''
+    stemmer = PorterStemmer()
+    return [stemmer.stem(word) for word in pos_lines]
