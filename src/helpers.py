@@ -1,4 +1,5 @@
 import csv
+import re
 
 def create_submission_csv(y_pred):
     '''give predictions and create submission csv file'''
@@ -17,3 +18,7 @@ def create_dict_from_csv(csv_path):
         result = dict(reader)
         return result
     
+def write_file(_list, filename):
+    with open('../twitter-datasets/{file}.txt'.format(file=filename), 'w') as f_out:
+        for line in _list:
+            f_out.write("%s\n" % re.sub('[ ]+', ' ', line).strip())   

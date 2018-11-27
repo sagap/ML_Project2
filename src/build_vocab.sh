@@ -2,4 +2,4 @@
 
 # Note that this script uses GNU-style sed. On Mac OS, you are required to first
 #    brew install gnu-sed --with-default-names
-cat ../twitter-datasets/train_pos.txt ../twitter-datasets/train_neg.txt | sed "s/ /\n/g" | grep -v "^\s*$" | sort | uniq -c > ../twitter-datasets/vocab.txt
+cat ../twitter-datasets/train_pos_processed.txt ../twitter-datasets/train_neg_processed.txt | sed "s/ /\n/g" | grep -v "^\s*$" | sort | uniq -c > ../twitter-datasets/vocab.txt

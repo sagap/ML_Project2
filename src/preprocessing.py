@@ -58,9 +58,4 @@ def replace_emoji(text):
     return rep_text
 
 def replace_numbers(text):
-    return re.sub('[-+:\*\\\\/x#]?[0-9]+', ' number ', text)
-
-def write_file(_list, filename):
-    with open('../twitter-datasets/{file}.txt'.format(file=filename), 'w') as f_out:
-        for line in _list:
-            f_out.write("%s\n" % line.strip())
+    return re.sub('[-+:\*\\\\/x#]?[0-9]+', ' ', text)
