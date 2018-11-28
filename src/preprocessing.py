@@ -1,7 +1,8 @@
 #preprocessing techniques
 import re
-import helpers
-from nltk.corpus import wordnet
+import helpers, string
+from nltk.corpus import wordnet, stopwords
+from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 
 
@@ -71,3 +72,22 @@ def stemming_using_Porter(text):
     '''function that uses PorterStemmer on a list of tweets'''
     stemmer = PorterStemmer()
     return [stemmer.stem(word) for word in pos_lines]
+
+def remove_stopwords(text):
+    ''' function that removes stop words based on the corpus of nltk '''
+    return ' '.join([word for word in text.split(' ') if word not in stopwords.words('english')])
+
+def lemmatize_verbs(text):
+    ''' function that lemmatizes words based on WordNetLemmatizer'''
+    lemmatizer = WordNetLemmatizer()
+    lemmatized_tweet = []
+    [lemmatized_tweet.append(lemmatizer.lemmatize(word, pos='v')) for word in text.split(' ')]
+    return ' '.join(lemmatized_tweet)
+
+def replace_repeated_punctuation(tweet):
+    # TODO
+    return None
+
+def remove_punctuation(text):
+    ''' function that is executed after 'replace_emoji' to remove all the uneccesary punctuations'''
+    return ' '.join([element for element in text.split(' ') if element not in string.punctuation])
