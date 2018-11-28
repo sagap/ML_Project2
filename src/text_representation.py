@@ -33,3 +33,19 @@ def create_tweet_features(path_to_file, vocab_dict, shape_of_word_embeddings):
             tweet_features = np.mean(tweet_features, axis=0)
             features = np.vstack((features, tweet_features))
     return features
+
+def create_test_tweet_features(path_to_file, vocab_dict, shape_of_word_embeddings):
+    '''give path to file and vocabulary dictionary
+        and return features of the tweets'''
+    features = np.empty(shape=shape_of_word_embeddings)
+    with open(path_to_file, 'r') as file_in:
+        lines = file_in.readlines()    
+        for line in lines:
+            tweet = line.replace('\n', '').split(' ')
+            tweet_features = np.zeros(shape=(len(tweet), shape_of_word_embeddings))
+            for i in range(0, len(tweet)):
+                if tweet[i] in vocab_dict:
+                    tweet_features[i] = vocab_dict[tweet[i]]
+            tweet_features = np.mean(tweet_features, axis=0)
+            features = np.vstack((features, tweet_features))
+    return features

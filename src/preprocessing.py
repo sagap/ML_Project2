@@ -13,6 +13,27 @@ contractions_regexp = re.compile('(%s)' % '|'.join(contractions.keys()))
 # compile regex to find 
 elongated_regex = re.compile(r"(.)\1{1}")
 
+def do_preprocessing(filepath, test_file=False):
+    with open(filepath, 'r') as f_in:
+        lines = f_in.readlines()
+        f_in.close()    
+    
+    if test_file:
+        lines = [line.split(',', 1)[1] for line in lines]
+    
+    processed_list = []
+    for line in lines:
+        pro_line = line
+        pro_line = remove_unnecessary(pro_line)
+        pro_line = replace_contraction(pro_line)
+        pro_line = replace_numbers(pro_line)
+        pro_line = replace_emoji(pro_line)
+        pro_line = replace_elongated_word(pro_line)
+        processed_list.append(pro_line)
+
+    filename = filepath.split('/')[-1][:-4] + '_processed'
+    helpers.write_file(processed_list, filename)
+
 def replace_contraction(tweet):
     '''function that replaces possible contractions in tweets
         based on the contractions dictionary
