@@ -4,6 +4,7 @@ import helpers, string
 from nltk.corpus import wordnet, stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
+from nltk.tokenize import RegexpTokenizer
 
 
 #create contractions dictionary
@@ -48,7 +49,7 @@ def is_elongated(word):
     
 def replace_elongated(line):
     ''' function that takes a line as input and checks for elongated words'''
-    fixed_tweet = [replace_elongated_word(word) for word in line.split()]
+    fixed_tweet = fixed_tweet = [replace_elongated_word(word) if len(wordnet.synsets(word))==0 else word for word in line.split()]
     return ' '.join(fixed_tweet)    
 
 def replace_elongated_word(word):
@@ -57,10 +58,10 @@ def replace_elongated_word(word):
 	e.g. Goooodd -> Good
     '''
     if wordnet.synsets(word):
-        return word
+        return word + word
     elif is_elongated(word):
         return replace_elongated_word(elongated_regex.sub(r'\1', word))
-    return word
+    return word + word
 
 # for debugging reasons
 def countElongated(text):
@@ -86,8 +87,10 @@ def replace_emoji(text):
     rep_text = re.sub(':-\||<:-\||>.<|:S|:\/|=\/|:\\\\| : - s ', ' skeptical ', rep_text)
     return rep_text
 
+# def replace_numbers(text):
+#     return re.sub('[-+:\*\\\\/x#]?[0-9]+', ' ', text)
 def replace_numbers(text):
-    return re.sub('[-+:\*\\\\/x#]?[0-9]+', ' ', text)
+    return re.sub('[0-9]', ' ', text)
 
 def stemming_using_Porter(text):
     '''function that uses PorterStemmer on a list of tweets'''
@@ -106,9 +109,20 @@ def lemmatize_verbs(text):
     return ' '.join(lemmatized_tweet)
 
 def replace_repeated_punctuation(tweet):
-    # TODO
-    return None
+    tokenizer = RegexpTokenizer(r'\w+')
+    return " ".join(tokenizer.tokenize(tweet))
 
 def remove_punctuation(text):
     ''' function that is executed after 'replace_emoji' to remove all the uneccesary punctuations'''
     return ' '.join([element for element in text.split(' ') if element not in string.punctuation])
+
+def replace_exclamation(text):
+    return re.sub('![ !]+', ' !!! ', text)
+
+def pos_tag(tweet):
+    tweet = nltk.word_tokenize(tweet.lower())
+    return nltk.pos_tag(tweet)
+
+def separate_hashtags():
+    # TODO
+    return
