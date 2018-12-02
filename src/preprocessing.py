@@ -5,7 +5,7 @@ from nltk.corpus import wordnet, stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
-
+from tqdm import tqdm
 
 #create contractions dictionary
 contractions = helpers.create_dict_from_csv('utils/contractions.csv')
@@ -23,13 +23,16 @@ def do_preprocessing(filepath, test_file=False):
         lines = [line.split(',', 1)[1] for line in lines]
     
     processed_list = []
-    for line in lines:
+    for line in tqdm(lines):
         pro_line = line
         pro_line = remove_unnecessary(pro_line)
         pro_line = replace_contraction(pro_line)
         pro_line = replace_numbers(pro_line)
         pro_line = replace_emoji(pro_line)
-        pro_line = replace_elongated_word(pro_line)
+        pro_line = replace_elongated(pro_line)
+#        pro_line = stemming_using_Porter(pro_line)
+        pro_line = remove_stopwords(pro_line)
+#        pro_line = lemmatize_verbs(pro_line)
         processed_list.append(pro_line)
 
     filename = filepath.split('/')[-1][:-4] + '_processed'
@@ -95,7 +98,7 @@ def replace_numbers(text):
 def stemming_using_Porter(text):
     '''function that uses PorterStemmer on a list of tweets'''
     stemmer = PorterStemmer()
-    return [stemmer.stem(word) for word in pos_lines]
+    return ' '.join([stemmer.stem(word) for word in text.split(' ')])
 
 def remove_stopwords(text):
     ''' function that removes stop words based on the corpus of nltk '''
@@ -126,3 +129,13 @@ def pos_tag(tweet):
 def separate_hashtags():
     # TODO
     return
+def convert_to_lowercase(text):
+    '''
+    Converts all words in the article into lower case
+    
+    Parameters:
+    text: text string
+    return: text string to lower case
+    '''
+    return text.lower()
+

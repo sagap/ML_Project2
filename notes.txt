@@ -57,7 +57,7 @@ lemmatization and stemming)
 - bag of words
 - pagraph embeddings
 
-3. ML algorithms
+3. ML algorithms            IMPORTANT give your ml method as argument in the method and let it compute the accuracy
 - Naive bayes. should we??
 - FastText?
 - Neural Network (Convolutional) 
