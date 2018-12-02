@@ -7,6 +7,8 @@ from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 from tqdm import tqdm
 
+#create slang dictionary
+slang_dict = helpers.create_dict_from_csv('../twitter-datasets/slang.csv')
 #create contractions dictionary
 contractions = helpers.create_dict_from_csv('utils/contractions.csv')
 #compile regular expressions from dictionary keys
@@ -75,19 +77,23 @@ def remove_unnecessary(text):
     return re.sub(r'<user>|<url>|\n', '', text)
 
 def replace_emoji(text):
-    rep_text = ' ' + text + ' '
-    rep_text = re.sub('>:\)|>:D|>:-D|>;\)|>:-\)|}:-\)|}:\)|3:-\)|3:\)', ' devil ', rep_text)
+    rep_text = text
+    rep_text = re.sub(':(-)?@', ' angry ', rep_text)
+    rep_text = re.sub(':( )?\$', ' blushing ', rep_text)
+    rep_text = re.sub('>:\)|>:D|>:-D|>;\)|>:-\)|}:-\)|}:\)|3:-\)|3:\)', ' devil ', rep_text) #done
     rep_text = re.sub('O:-\)|0:-3|0:3|0:-\)|0:\)|0;^\)', ' angel ', rep_text)
-    rep_text = re.sub(':\)+|\(+:|:-\)+|\(+-:|:\}| c : ', ' happy ', rep_text)
-    # replace laugh icons with happy 
-    rep_text = re.sub(':-D|:D|=D|=-D|8-D|8D|x-D|xD|X-D|=-D|:d|:-d|>:d|=3|=-3|:\'-\)|:\'\)|\(\':|\[:|:\]| : \) ', ' happy ', rep_text)    
-    rep_text = re.sub('\)+:|:\(+|:-\(+|\)+-:|>:\[| : c |:\|', ' sad ', rep_text)
-    rep_text = re.sub(':[ ]*\*|:-\*+|:x|: - \*', ' kiss ', rep_text, flags=re.I)
+    rep_text = re.sub(':( )?\)+|\(+:|:-\)+|\(+-:|:\}| c : |:( )?O( )?\)|:( )?-( )?]|^( )?-( )?^', ' happy ', rep_text, flags=re.I)
+    rep_text = re.sub(
+        ':-D|:D|=D|=-D|8-D|8D|x-D|xD|X-D|=-D|:( )?d|:-d|>:d|=3|=-3|:\'-\)|:\'\)|\(\':|\[:|:\]', ' happy ', rep_text)    
+    rep_text = re.sub('\)+:|:\(+|:-\(+|\)+-:|>:\[| : c |:\||:-\[', ' sad ', rep_text)
+    rep_text = re.sub(':( )?\*|:( )?-( )?\*+|:x', ' kiss ', rep_text, flags=re.I) 
     rep_text = re.sub('<3', ' heart ', rep_text)
     rep_text = re.sub(';-\)|;\)|\*\)|\*-\)|;-\]|;]|;D|;\^\)', ' wink ', rep_text)
     rep_text = re.sub('>:P|:-P|:P|X-P|xp|=p|:b|:-b|;p| : p ', ' tongue ', rep_text, flags=re.I)
-    rep_text = re.sub('>:O|:-O|:O| : O|: - o', ' surprise ', rep_text, flags=re.I)
-    rep_text = re.sub(':-\||<:-\||>.<|:S|:\/|=\/|:\\\\| : - s ', ' skeptical ', rep_text)
+    rep_text = re.sub('>:O|:( )?-( )?O|:( )?O', ' surprise ', rep_text, flags=re.I) #done
+    rep_text = re.sub(
+    ':-\||<:-\||>( )?.( )?<|:( )?-( )?\/|:( )?-( )?\\\\|:S|:( )?\/|=\/|=( )?\\\\|:( )?\\\\|:( )?-( )?s|;( )?/|:( )?l ',
+    ' skeptical ', rep_text) #done
     return rep_text
 
 # def replace_numbers(text):
@@ -119,16 +125,22 @@ def remove_punctuation(text):
     ''' function that is executed after 'replace_emoji' to remove all the uneccesary punctuations'''
     return ' '.join([element for element in text.split(' ') if element not in string.punctuation])
 
-def replace_exclamation(text):
-    return re.sub('![ !]+', ' !!! ', text)
+def replace_exclamation(tweet):
+    return re.sub('!((\s)?!)+', ' !! ', tweet)
 
 def pos_tag(tweet):
     tweet = nltk.word_tokenize(tweet.lower())
     return nltk.pos_tag(tweet)
 
-def separate_hashtags():
-    # TODO
-    return
+def separate_hashtags(tweet):
+    # TODO: func must be called in the end
+    # TODO: Check if we want <hashtag> happy
+    new_tokens = []
+    tokens = tweet.split(' ')
+    for token in tokens:
+        new_tokens.append(re.sub(r'#\b[\w]+', token[1:], token))
+    return ' '.join(new_tokens) 
+
 def convert_to_lowercase(text):
     '''
     Converts all words in the article into lower case
@@ -139,3 +151,12 @@ def convert_to_lowercase(text):
     '''
     return text.lower()
 
+def remove_singe_char(tweet):
+    '''Does not remove char if it is in the beggining or the end of the tweet'''
+    return re.sub('\s\w\s', ' ', tweet)
+
+def replace_slang(tweet):
+    return ' '.join([slang_dict[word] if word in slang_dict else word for word in tweet.split(' ')])
+
+def replace_white_spaces(tweet):
+    return re.sub('\s+', ' ', tweet)

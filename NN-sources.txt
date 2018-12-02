@@ -1,0 +1,7 @@
+1) https://chatbotslife.com/how-neural-networks-work-ff4c7ad371f7
+
+2) https://machinelearnings.co/text-classification-using-neural-networks-f5cd7b8765c6
+
+3) https://www.analyticsvidhya.com/blog/2018/04/a-comprehensive-guide-to-understand-and-implement-text-classification-in-python/
+
+4) https://devklaus.wordpress.com/2018/03/11/sentiment-analysis-on-us-twitter-airlines-dataset-a-deep-learning-approach/
