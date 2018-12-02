@@ -49,3 +49,14 @@ def create_test_tweet_features(path_to_file, vocab_dict, shape_of_word_embedding
             tweet_features = np.mean(tweet_features, axis=0)
             features = np.vstack((features, tweet_features))
     return features
+
+def create_feature_representation(feature_representation):
+	''' the parameter feature_representation specifices which Vectorizer,
+	    will be used to extract the features from tweets
+	'''
+	if feature_representation == 'CountVectorizer':
+		return CountVectorizer()
+	elif feature_representation == 'TfidfVectorizer':
+		return TfidfVectorizer(stop_words=None, ngram_range=(1,1), sublinear_tf=True)
+
+		

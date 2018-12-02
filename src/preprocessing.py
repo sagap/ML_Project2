@@ -1,10 +1,12 @@
 #preprocessing techniques
+import numpy as np
 import re
 import helpers, string
 from nltk.corpus import wordnet, stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
+from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 
 #create slang dictionary
@@ -28,17 +30,40 @@ def do_preprocessing(filepath, test_file=False):
     for line in tqdm(lines):
         pro_line = line
         pro_line = remove_unnecessary(pro_line)
+        # pro_line = separate_hashtags(pro_line)
+        # pro_line = convert_to_lowercase(pro_line)
+        # pro_line = lemmatize_verbs(pro_line)
         pro_line = replace_contraction(pro_line)
         pro_line = replace_numbers(pro_line)
         pro_line = replace_emoji(pro_line)
         pro_line = replace_elongated(pro_line)
-#        pro_line = stemming_using_Porter(pro_line)
-        pro_line = remove_stopwords(pro_line)
-#        pro_line = lemmatize_verbs(pro_line)
+        # pro_line = stemming_using_Porter(pro_line)
+        # pro_line = remove_stopwords(pro_line)
+        pro_line = remove_new_line(pro_line)
         processed_list.append(pro_line)
 
     filename = filepath.split('/')[-1][:-4] + '_processed'
     helpers.write_file(processed_list, filename)
+
+def return_processed_trainset_and_y(full_dataset=True):
+    if full_dataset:
+        pos_file = '../twitter-datasets/train_pos_full_processed.txt'
+        neg_file = '../twitter-datasets/train_neg_full_processed.txt'
+    else:
+        pos_file = '../twitter-datasets/train_pos_processed.txt'
+        neg_file = '../twitter-datasets/train_neg_processed.txt'
+    with open(pos_file) as pos_in, open(neg_file) as neg_in:
+        pos_lines = pos_in.readlines()
+        neg_lines = neg_in.readlines()
+        pos_in.close()
+        neg_in.close()
+    lines = pos_lines + neg_lines
+    #remove '\n' escape character
+    lines = [remove_new_line(line) for line in lines]
+    y = np.zeros(shape=(len(lines)))
+    y[:len(pos_lines)] = 1
+    y[len(pos_lines):] = -1
+    return lines, y
 
 def replace_contraction(tweet):
     '''function that replaces possible contractions in tweets
@@ -68,13 +93,11 @@ def replace_elongated_word(word):
         return replace_elongated_word(elongated_regex.sub(r'\1', word))
     return word + word
 
-# for debugging reasons
-def countElongated(text):
-    """ Input: a text, Output: how many words are elongated """
-    return len([word for word in text.split() if elongated_regex.search(word)])
+def remove_tags(text):
+    return re.sub(r'<user>|<url>', '', text)
 
-def remove_unnecessary(text):
-    return re.sub(r'<user>|<url>|\n', '', text)
+def remove_new_line(text):
+    return re.sub(r'\n', '', text)
 
 def replace_emoji(text):
     rep_text = text
@@ -99,6 +122,7 @@ def replace_emoji(text):
 # def replace_numbers(text):
 #     return re.sub('[-+:\*\\\\/x#]?[0-9]+', ' ', text)
 def replace_numbers(text):
+    # TODO decide if it will be empty or leave the <number>.
     return re.sub('[0-9]', ' ', text)
 
 def stemming_using_Porter(text):
@@ -160,3 +184,7 @@ def replace_slang(tweet):
 
 def replace_white_spaces(tweet):
     return re.sub('\s+', ' ', tweet)
+
+def standardize_with_standrard_scaler(train_tweets):
+    scaler = StandardScaler(with_mean=False)
+    return scaler.fit_transform(train_tweets)
