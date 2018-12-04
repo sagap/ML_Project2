@@ -29,7 +29,7 @@ def do_preprocessing(filepath, test_file=False):
     processed_list = []
     for line in tqdm(lines):
         pro_line = line
-        pro_line = remove_unnecessary(pro_line)
+        pro_line = remove_tags(pro_line)
         # pro_line = separate_hashtags(pro_line)
         # pro_line = convert_to_lowercase(pro_line)
         # pro_line = lemmatize_verbs(pro_line)
