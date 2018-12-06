@@ -21,4 +21,4 @@ def create_dict_from_csv(csv_path):
 def write_file(_list, filename):
     with open('../twitter-datasets/{file}.txt'.format(file=filename), 'w') as f_out:
         for line in _list:
-            f_out.write("%s\n" % re.sub('[ ]+', ' ', line).strip())   
+            f_out.write("%s\n" % re.sub('( )+', ' ', line).strip())   

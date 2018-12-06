@@ -8,6 +8,7 @@ from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
+from math import log
 
 #create slang dictionary
 slang_dict = helpers.create_dict_from_csv('../twitter-datasets/slang.csv')
@@ -91,7 +92,7 @@ def replace_elongated_word(word):
         return word + word
     elif is_elongated(word):
         return replace_elongated_word(elongated_regex.sub(r'\1', word))
-    return word + word
+    return word
 
 def remove_tags(text):
     return re.sub(r'<user>|<url>', '', text)
@@ -157,13 +158,16 @@ def pos_tag(tweet):
     return nltk.pos_tag(tweet)
 
 def separate_hashtags(tweet):
-    # TODO: func must be called in the end
-    # TODO: Check if we want <hashtag> happy
+    # TODO: Check if we want <hashtag> in the beginning
+    # slightly worst than without it in tfidf-csv_local-small_dataset
+    # but might be useful for NN
     new_tokens = []
     tokens = tweet.split(' ')
     for token in tokens:
-        new_tokens.append(re.sub(r'#\b[\w]+', token[1:], token))
-    return ' '.join(new_tokens) 
+        if token.startswith('#'): new_tokens.append(
+            '<hashtag> ' + hashtag.split_hashtag_to_words(token))
+        else: new_tokens.append(token)
+    return ' '.join(new_tokens)
 
 def convert_to_lowercase(text):
     '''
@@ -188,3 +192,78 @@ def replace_white_spaces(tweet):
 def standardize_with_standrard_scaler(train_tweets):
     scaler = StandardScaler(with_mean=False)
     return scaler.fit_transform(train_tweets)
+
+def filter_digits(tweet):
+    """
+    DESCRIPTION: 
+                Filters digits from a tweet. Words that contain digits are not filtered.
+    INPUT: 
+                tweet: a tweet as a python string
+    OUTPUT: 
+                digit-filtered tweet as a python string
+    """
+    t = []
+    for w in tweet.split():
+        try:
+            num = re.sub('[,\.:%_\-\+\*\/\%\_]', '', w)
+            float(num)
+            t.append("number")
+        except:
+            t.append(w)
+    return (" ".join(t)).strip()
+
+#Copyright (c) http://stackoverflow.com/users/1515832/generic-human (http://stackoverflow.com/a/11642687)
+
+# Build a cost dictionary, assuming Zipf's law and cost = -math.log(probability).
+words = open('words-by-frequency.txt').read().split()
+wordcost = dict((k, log((i+1)*log(len(words)))) for i,k in enumerate(words))
+maxword = max(len(x) for x in words)
+
+
+def split_hashtag_to_words(hashtag):
+    try: return infer_spaces(hashtag[1:]).strip()
+    except: return hashtag[1:]
+
+def infer_spaces(s):
+    """Uses dynamic programming to infer the location of spaces in a string
+    without spaces."""
+
+    # Find the best match for the i first characters, assuming cost has
+    # been built for the i-1 first characters.
+    # Returns a pair (match_cost, match_length).
+    def best_match(i):
+        candidates = enumerate(reversed(cost[max(0, i-maxword):i]))
+        return min((c + wordcost.get(s[i-k-1:i], 9e999), k+1) for k,c in candidates)
+    
+    new_s = ''
+    new_s = re.sub('[0-9]+', 'number', s)
+    s = new_s
+    
+    # Build the cost array.
+    cost = [0]
+    for i in range(1,len(s)+1):
+        c,k = best_match(i)
+        cost.append(c)
+
+    # Backtrack to recover the minimal-cost string.
+    out = []
+    i = len(s)
+    while i>0:
+        c,k = best_match(i)
+        assert c == cost[i]
+        out.append(s[i-k:i])
+        i -= k
+
+    return " ".join(reversed(out))
+
+def separate_hashtags(tweet):
+    # TODO: Check if we want <hashtag> in the beginning
+    # slightly worst than without it in tfidf-csv_local-small_dataset
+    # but might be useful for NN
+    new_tokens = []
+    tokens = tweet.split(' ')
+    for token in tokens:
+        if token.startswith('#'): new_tokens.append(
+            '<hashtag> ' + split_hashtag_to_words(token))
+        else: new_tokens.append(token)
+    return ' '.join(new_tokens)
