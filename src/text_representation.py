@@ -57,6 +57,6 @@ def create_feature_representation(feature_representation):
 	if feature_representation == 'CountVectorizer':
 		return CountVectorizer()
 	elif feature_representation == 'TfidfVectorizer':
-		return TfidfVectorizer(stop_words=None, ngram_range=(1,1), sublinear_tf=True)
-
-		
+		return TfidfVectorizer(stop_words=None, ngram_range=(1,2), sublinear_tf=True)
+	elif feature_representation == 'Word2Vec'
+	# TODO
