@@ -31,15 +31,13 @@ def do_preprocessing(filepath, test_file=False):
     for line in tqdm(lines):
         pro_line = line
         pro_line = remove_tags(pro_line)
-        # pro_line = separate_hashtags(pro_line)
-        # pro_line = convert_to_lowercase(pro_line)
-        # pro_line = lemmatize_verbs(pro_line)
+        pro_line = replace_slang(pro_line)
         pro_line = replace_contraction(pro_line)
-        pro_line = replace_numbers(pro_line)
         pro_line = replace_emoji(pro_line)
+        pro_line = convert_to_lowercase(pro_line)
+        pro_line = filter_digits(pro_line)
         pro_line = replace_elongated(pro_line)
-        # pro_line = stemming_using_Porter(pro_line)
-        # pro_line = remove_stopwords(pro_line)
+        pro_line = separate_hashtags(pro_line)
         pro_line = remove_new_line(pro_line)
         processed_list.append(pro_line)
 
@@ -215,7 +213,7 @@ def filter_digits(tweet):
 #Copyright (c) http://stackoverflow.com/users/1515832/generic-human (http://stackoverflow.com/a/11642687)
 
 # Build a cost dictionary, assuming Zipf's law and cost = -math.log(probability).
-words = open('words-by-frequency.txt').read().split()
+words = open('../twitter-datasets/words-by-frequency.txt').read().split()
 wordcost = dict((k, log((i+1)*log(len(words)))) for i,k in enumerate(words))
 maxword = max(len(x) for x in words)
 
