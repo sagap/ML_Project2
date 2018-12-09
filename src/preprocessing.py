@@ -9,6 +9,7 @@ from nltk.tokenize import RegexpTokenizer
 from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 from math import log
+import pandas as pd
 
 #create slang dictionary
 slang_dict = helpers.create_dict_from_csv('../twitter-datasets/slang.csv')
@@ -44,7 +45,7 @@ def do_preprocessing(filepath, test_file=False):
     filename = filepath.split('/')[-1][:-4] + '_processed'
     helpers.write_file(processed_list, filename)
 
-def return_processed_trainset_and_y(full_dataset=True):
+def return_processed_trainset_and_y(full_dataset=True, result_is_dataframe=False):
     if full_dataset:
         pos_file = '../twitter-datasets/train_pos_full_processed.txt'
         neg_file = '../twitter-datasets/train_neg_full_processed.txt'
@@ -59,6 +60,11 @@ def return_processed_trainset_and_y(full_dataset=True):
     lines = pos_lines + neg_lines
     #remove '\n' escape character
     lines = [remove_new_line(line) for line in lines]
+    if result_is_dataframe:
+        df = pd.DataFrame(lines)
+        df['sentiment'] = 1
+        df.loc[len(pos_lines):,'sentiment'] = -1
+        return df
     y = np.zeros(shape=(len(lines)))
     y[:len(pos_lines)] = 1
     y[len(pos_lines):] = -1
