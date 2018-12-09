@@ -106,22 +106,22 @@ def remove_new_line(text):
 
 def replace_emoji(text):
     rep_text = text
-    rep_text = re.sub(':(-)?@', ' angry ', rep_text)
-    rep_text = re.sub(':( )?\$', ' blushing ', rep_text)
-    rep_text = re.sub('>:\)|>:D|>:-D|>;\)|>:-\)|}:-\)|}:\)|3:-\)|3:\)', ' devil ', rep_text) #done
-    rep_text = re.sub('O:-\)|0:-3|0:3|0:-\)|0:\)|0;^\)', ' angel ', rep_text)
-    rep_text = re.sub(':( )?\)+|\(+:|:-\)+|\(+-:|:\}| c : |:( )?O( )?\)|:( )?-( )?]|^( )?-( )?^', ' happy ', rep_text, flags=re.I)
+    rep_text = re.sub(':(-)?@', ' angry_emoji ', rep_text)
+    rep_text = re.sub(':( )?\$', ' blushing_emoji ', rep_text)
+    rep_text = re.sub('>:\)|>:D|>:-D|>;\)|>:-\)|}:-\)|}:\)|3:-\)|3:\)', ' devil_emoji ', rep_text) #done
+    rep_text = re.sub('O:-\)|0:-3|0:3|0:-\)|0:\)|0;^\)', ' angel_emoji ', rep_text)
+    rep_text = re.sub(':( )?\)+|\(+:|:-\)+|\(+-:|:\}| c : |:( )?O( )?\)|:( )?-( )?]|^( )?-( )?^', ' happy_emoji ', rep_text, flags=re.I)
     rep_text = re.sub(
-        ':-D|:D|=D|=-D|8-D|8D|x-D|xD|X-D|=-D|:( )?d|:-d|>:d|=3|=-3|:\'-\)|:\'\)|\(\':|\[:|:\]', ' happy ', rep_text)    
-    rep_text = re.sub('\)+:|:\(+|:-\(+|\)+-:|>:\[| : c |:\||:-\[', ' sad ', rep_text)
-    rep_text = re.sub(':( )?\*|:( )?-( )?\*+|:x', ' kiss ', rep_text, flags=re.I) 
+        ':-D|:D|=D|=-D|8-D|8D|x-D|xD|X-D|=-D|:( )?d|:-d|>:d|=3|=-3|:\'-\)|:\'\)|\(\':|\[:|:\]', ' happy_emoji ', rep_text)    
+    rep_text = re.sub('\)+:|:\(+|:-\(+|\)+-:|>:\[| : c |:\||:-\[', ' sad_emoji ', rep_text)
+    rep_text = re.sub(':( )?\*|:( )?-( )?\*+|:x', ' kiss_emoji ', rep_text, flags=re.I) 
     rep_text = re.sub('<3', ' heart ', rep_text)
-    rep_text = re.sub(';-\)|;\)|\*\)|\*-\)|;-\]|;]|;D|;\^\)', ' wink ', rep_text)
-    rep_text = re.sub('>:P|:-P|:P|X-P|xp|=p|:b|:-b|;p| : p ', ' tongue ', rep_text, flags=re.I)
-    rep_text = re.sub('>:O|:( )?-( )?O|:( )?O', ' surprise ', rep_text, flags=re.I) #done
+    rep_text = re.sub(';-\)|;\)|\*\)|\*-\)|;-\]|;]|;D|;\^\)', ' wink_emoji ', rep_text)
+    rep_text = re.sub('>:P|:-P|:P|X-P|xp|=p|:b|:-b|;p| : p ', ' tongue_emoji ', rep_text, flags=re.I)
+    rep_text = re.sub('>:O|:( )?-( )?O|:( )?O', ' surprise_emoji ', rep_text, flags=re.I) #done
     rep_text = re.sub(
     ':-\||<:-\||>( )?.( )?<|:( )?-( )?\/|:( )?-( )?\\\\|:S|:( )?\/|=\/|=( )?\\\\|:( )?\\\\|:( )?-( )?s|;( )?/|:( )?l ',
-    ' skeptical ', rep_text) #done
+    ' skeptical_emoji ', rep_text) #done
     return rep_text
 
 # def replace_numbers(text):
