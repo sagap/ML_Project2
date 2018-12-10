@@ -2,4 +2,4 @@
 
 # Note that this script uses GNU-style sed. On Mac OS, you are required to first
 #    brew install gnu-sed --with-default-names
-cat ../twitter-datasets/vocab.txt | sed "s/^\s\+//g" | sort -rn | grep -v "^[1]\s" | cut -d' ' -f2 > ../twitter-datasets/vocab_cut.txt
+cat ../data/intermediate/vocab.txt | sed "s/^\s\+//g" | sort -rn | grep -v "^[1]\s" | cut -d' ' -f2 > ../data/intermediate/vocab_cut.txt

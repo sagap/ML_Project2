@@ -7,7 +7,7 @@ import random
 
 def main():
     print("loading cooccurrence matrix")
-    with open('../twitter-datasets/cooc.pkl', 'rb') as f:
+    with open('../data/intermediate/cooc.pkl', 'rb') as f:
         cooc = pickle.load(f)
     print("{} nonzero entries".format(cooc.nnz))
 
@@ -32,7 +32,7 @@ def main():
 			# for the update resulting from co-occurence (i,j)
 		
 
-    np.save('../twitter-datasets/embeddings', xs)
+    np.save('../data/intermediate/embeddings', xs)
 
 
 if __name__ == '__main__':

@@ -1,14 +1,17 @@
 import numpy as np
 
+DATA_UTILS = '../data/utils/'
+DATA_INTERMEDIATE = '../data/intermediate/'
+
 def load_embeddings():
     '''load embeddings provided''' 
-    np.load('../twitter-datasets/embeddings.npy')
+    np.load(DATA_INTERMEDIATE + 'embeddings.npy')
 
 def create_dict_from_provided_vocabulary():
     '''create dict for test purposes'''
     vocab_dict = {}
-    embeddings = np.load('../twitter-datasets/embeddings.npy')
-    with open('../twitter-datasets/vocab_cut.txt', 'r') as vocab_in:
+    embeddings = np.load(DATA_INTERMEDIATE + 'embeddings.npy')
+    with open(DATA_INTERMEDIATE + 'vocab_cut.txt', 'r') as vocab_in:
         vocab_lines = vocab_in.readlines()
         line_counter = 0
         for line in vocab_lines:
@@ -58,5 +61,5 @@ def create_feature_representation(feature_representation):
 		return CountVectorizer()
 	elif feature_representation == 'TfidfVectorizer':
 		return TfidfVectorizer(stop_words=None, ngram_range=(1,2), sublinear_tf=True)
-	elif feature_representation == 'Word2Vec'
+	# elif feature_representation == 'Word2Vec'
 	# TODO

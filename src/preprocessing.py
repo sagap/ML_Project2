@@ -11,10 +11,13 @@ from tqdm import tqdm
 from math import log
 import pandas as pd
 
+DATA_UTILS = '../data/utils/'
+DATA_INTERMEDIATE = '../data/intermediate/'
+
 #create slang dictionary
-slang_dict = helpers.create_dict_from_csv('../twitter-datasets/slang.csv')
+slang_dict = helpers.create_dict_from_csv(DATA_UTILS + 'slang.csv')
 #create contractions dictionary
-contractions = helpers.create_dict_from_csv('utils/contractions.csv')
+contractions = helpers.create_dict_from_csv(DATA_UTILS + 'contractions.csv')
 #compile regular expressions from dictionary keys
 contractions_regexp = re.compile('(%s)' % '|'.join(contractions.keys()))
 # compile regex to find 
@@ -47,11 +50,11 @@ def do_preprocessing(filepath, test_file=False):
 
 def return_processed_trainset_and_y(full_dataset=True, result_is_dataframe=False):
     if full_dataset:
-        pos_file = '../twitter-datasets/train_pos_full_processed.txt'
-        neg_file = '../twitter-datasets/train_neg_full_processed.txt'
+        pos_file = DATA_INTERMEDIATE + 'train_pos_full_processed.txt'
+        neg_file = DATA_INTERMEDIATE + 'train_neg_full_processed.txt'
     else:
-        pos_file = '../twitter-datasets/train_pos_processed.txt'
-        neg_file = '../twitter-datasets/train_neg_processed.txt'
+        pos_file = DATA_INTERMEDIATE + 'train_pos_processed.txt'
+        neg_file = DATA_INTERMEDIATE + 'train_neg_processed.txt'
     with open(pos_file) as pos_in, open(neg_file) as neg_in:
         pos_lines = pos_in.readlines()
         neg_lines = neg_in.readlines()
@@ -219,7 +222,7 @@ def filter_digits(tweet):
 #Copyright (c) http://stackoverflow.com/users/1515832/generic-human (http://stackoverflow.com/a/11642687)
 
 # Build a cost dictionary, assuming Zipf's law and cost = -math.log(probability).
-words = open('../twitter-datasets/words-by-frequency.txt').read().split()
+words = open(DATA_UTILS + 'words-by-frequency.txt').read().split()
 wordcost = dict((k, log((i+1)*log(len(words)))) for i,k in enumerate(words))
 maxword = max(len(x) for x in words)
 

@@ -5,13 +5,13 @@ import pickle
 
 
 def main():
-    with open('../twitter-datasets/vocab.pkl', 'rb') as f:
+    with open('../data/intermediate/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
     vocab_size = len(vocab)
 
     data, row, col = [], [], []
     counter = 1
-    for fn in ['../twitter-datasets/train_pos_processed.txt', '../twitter-datasets/train_neg_processed.txt']:
+    for fn in ['../data/intermediate/train_pos_processed.txt', '../data/intermediate/train_neg_processed.txt']:
         with open(fn) as f:
             for line in f:
                 tokens = [vocab.get(t, -1) for t in line.strip().split()]
@@ -28,7 +28,7 @@ def main():
     cooc = coo_matrix((data, (row, col)))
     print("summing duplicates (this can take a while)")
     cooc.sum_duplicates()
-    with open('../twitter-datasets/cooc.pkl', 'wb') as f:
+    with open('../data/intermediate/cooc.pkl', 'wb') as f:
         pickle.dump(cooc, f, pickle.HIGHEST_PROTOCOL)
 
 

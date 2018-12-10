@@ -1,4 +1,5 @@
-twitter-datasets/
+/data/twitter-datasets/
+/data/intermediate/*_processed.txt
 src/.*
 src/__pycache__/
 src/.ipynb_checkpoints/*
