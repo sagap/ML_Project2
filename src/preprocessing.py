@@ -72,11 +72,11 @@ def return_processed_trainset_and_y(full_dataset=True, result_is_dataframe=False
     if result_is_dataframe:
         df = pd.DataFrame(lines)
         df['sentiment'] = 1
-        df.loc[len(pos_lines):,'sentiment'] = -1
+        df.loc[len(pos_lines):,'sentiment'] = 0
         return df
     y = np.zeros(shape=(len(lines)))
     y[:len(pos_lines)] = 1
-    y[len(pos_lines):] = -1
+    y[len(pos_lines):] = 0
     return lines, y
 
 def replace_contraction(tweet):
