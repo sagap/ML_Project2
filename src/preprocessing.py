@@ -10,6 +10,12 @@ from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 from math import log
 import pandas as pd
+import nltk
+# nltk.download('sentiwordnet')
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet as wn
+from nltk.corpus import sentiwordnet as swn
+from nltk import sent_tokenize, word_tokenize, pos_tag
 
 DATA_UTILS = '../data/utils/'
 DATA_INTERMEDIATE = '../data/intermediate/'
@@ -127,11 +133,23 @@ def replace_emoji(text):
     ' skeptical_emoji ', rep_text) #done
     return rep_text
 
-# def replace_numbers(text):
-#     return re.sub('[-+:\*\\\\/x#]?[0-9]+', ' ', text)
-def replace_numbers(text):
-    # TODO decide if it will be empty or leave the <number>.
-    return re.sub('[0-9]', ' ', text)
+def represents_float(s):
+    try: 
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def replace_numbers(tweet):
+    new_tokens = []
+    tokens = tweet.split(' ')
+    for token in tokens:
+        inter_token = re.sub('[,.:%_\+\-\*\/\%_]', '', token)
+        if represents_float(inter_token):
+            new_tokens.append('number')
+        else:
+            new_tokens.append(token)
+    return ' '.join(new_tokens)
 
 def stemming_using_Porter(text):
     '''function that uses PorterStemmer on a list of tweets'''
@@ -149,7 +167,7 @@ def lemmatize_verbs(text):
     [lemmatized_tweet.append(lemmatizer.lemmatize(word, pos='v')) for word in text.split(' ')]
     return ' '.join(lemmatized_tweet)
 
-def replace_repeated_punctuation(tweet):
+def replace_punctuation(tweet):
     tokenizer = RegexpTokenizer(r'\w+')
     return " ".join(tokenizer.tokenize(tweet))
 
@@ -160,9 +178,9 @@ def remove_punctuation(text):
 def replace_exclamation(tweet):
     return re.sub('!((\s)?!)+', ' !! ', tweet)
 
-def pos_tag(tweet):
-    tweet = nltk.word_tokenize(tweet.lower())
-    return nltk.pos_tag(tweet)
+# def pos_tag(tweet):
+#     tweet = nltk.word_tokenize(tweet.lower())
+#     return nltk.pos_tag(tweet)
 
 def separate_hashtags(tweet):
     # TODO: Check if we want <hashtag> in the beginning
@@ -200,24 +218,53 @@ def standardize_with_standrard_scaler(train_tweets):
     scaler = StandardScaler(with_mean=False)
     return scaler.fit_transform(train_tweets)
 
-def filter_digits(tweet):
+def penn_to_wn(tag):
     """
-    DESCRIPTION: 
-                Filters digits from a tweet. Words that contain digits are not filtered.
-    INPUT: 
-                tweet: a tweet as a python string
-    OUTPUT: 
-                digit-filtered tweet as a python string
+    Convert between the PennTreebank tags to simple Wordnet tags
     """
-    t = []
-    for w in tweet.split():
-        try:
-            num = re.sub('[,\.:%_\-\+\*\/\%\_]', '', w)
-            float(num)
-            t.append("number")
-        except:
-            t.append(w)
-    return (" ".join(t)).strip()
+    if tag.startswith('J'):
+        return wn.ADJ
+    elif tag.startswith('N'):
+        return wn.NOUN
+    elif tag.startswith('R'):
+        return wn.ADV
+    elif tag.startswith('V'):
+        return wn.VERB
+    return None
+
+def add_sentiment(tweet):
+ 
+    new_tweet = []  
+    tagged_tweet = pos_tag(word_tokenize(tweet))
+
+    for word, tag in tagged_tweet:
+        wn_tag = penn_to_wn(tag)
+        if wn_tag not in (wn.NOUN, wn.ADJ, wn.ADV):
+            new_tweet.append(word)
+            continue
+
+        lemma = WordNetLemmatizer().lemmatize(word, pos=wn_tag)
+        if not lemma:
+            new_tweet.append(word)
+            continue
+
+        synsets = wn.synsets(lemma, pos=wn_tag)
+        if not synsets:
+            new_tweet.append(word)
+            continue
+
+        # Take the first sense, the most common
+        synset = synsets[0]
+        swn_synset = swn.senti_synset(synset.name())
+
+        if swn_synset.pos_score() > 0.5:
+            new_tweet.append('positive ' + word)
+        elif swn_synset.neg_score() > 0.5:
+            new_tweet.append('negative ' + word)
+        else:
+            new_tweet.append(word)
+        
+    return ' '.join(new_tweet)
 
 #Copyright (c) http://stackoverflow.com/users/1515832/generic-human (http://stackoverflow.com/a/11642687)
 

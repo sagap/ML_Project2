@@ -1,3 +1,35 @@
+untitled: foivos	
+Test-Preprocessing.ipynb : foivos
+BoW-Copy1: foivos
+BoW: stelios keep
+BoW_preproc: stelios keeep
+
+
+preproc they do:
+
+-elongated
+-contraction:
+    tweets = tweets.str.replace('n\'t', ' not', case=False)
+    tweets = tweets.str.replace('i\'m', 'i am', case=False)
+    tweets = tweets.str.replace('\'re', ' are', case=False)
+    tweets = tweets.str.replace('it\'s', 'it is', case=False)
+    tweets = tweets.str.replace('that\'s', 'that is', case=False)
+    tweets = tweets.str.replace('\'ll', ' will', case=False)
+    tweets = tweets.str.replace('\'l', ' will', case=False)
+    tweets = tweets.str.replace('\'ve', ' have', case=False)
+    tweets = tweets.str.replace('\'d', ' would', case=False)
+    tweets = tweets.str.replace('he\'s', 'he is', case=False)
+    tweets = tweets.str.replace('what\'s', 'what is', case=False)
+    tweets = tweets.str.replace('who\'s', 'who is', case=False)
+    tweets = tweets.str.replace('\'s', '', case=False)
+-emoji  
+-hashtag
+-numbers 
+-sentiment
+
+
+Emphasize emoji ---> show sentiment!!!!!
+
 words in asterisks
 
 -----0. General Info-----
