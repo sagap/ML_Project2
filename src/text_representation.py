@@ -1,3 +1,4 @@
+import preprocessing as preproc
 import numpy as np
 import os
 from sklearn.feature_extraction.text import TfidfTransformer, TfidfVectorizer
@@ -43,6 +44,7 @@ def train_glove_WE(train_data, test_data, full_dataset, predefined=False):
         corpus = Corpus()
         corpus = corpus.load(corpus_file)
     else:
+        corpus = Corpus()
         tokenized_data = [preproc.replace_white_spaces(tweet).split(' ') for tweet in train_data]
         corpus.fit(tokenized_data, window = 5)
     # TODO: add this

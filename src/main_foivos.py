@@ -10,7 +10,7 @@ full_dataset = False
 
 train_data, y, test_data = helpers.get_processed_data(full_dataset=full_dataset)
 
-clf, X_test = helpers.transform_and_fit(train_data, y, test_data, text_representation='glove',
+clf, X_test = helpers.transform_and_fit(train_data, y, test_data, text_representation='word2vec',
                                         ml_algorithm='LR', cross_val=True, predefined=False)
 helpers.predict_and_save(clf, X_test)
 
