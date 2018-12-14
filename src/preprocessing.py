@@ -1,7 +1,7 @@
 #preprocessing techniques
 import numpy as np
 import re
-import helpers, string
+import string
 from nltk.corpus import wordnet, stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
@@ -17,6 +17,8 @@ from nltk.corpus import wordnet as wn
 from nltk.corpus import sentiwordnet as swn
 from nltk import sent_tokenize, word_tokenize, pos_tag
 
+import helpers
+
 DATA_UTILS = '../data/utils/'
 DATA_INTERMEDIATE = '../data/intermediate/'
 
@@ -29,30 +31,40 @@ contractions_regexp = re.compile('(%s)' % '|'.join(contractions.keys()))
 # compile regex to find 
 elongated_regex = re.compile(r"(.)\1{1}")
 
-def do_preprocessing(filepath, test_file=False):
+def do_preprocessing(filepath, is_test=False):
+    
+    initial_file = filepath.split('/')[-1]
+    new_file = initial_file[:-4] + '_processed'
+    print('preprocessing', initial_file)
+    
     with open(filepath, 'r') as f_in:
         lines = f_in.readlines()
         f_in.close()    
     
-    if test_file:
+    if is_test:
         lines = [line.split(',', 1)[1] for line in lines]
     
     processed_list = []
     for line in tqdm(lines):
         pro_line = line
-        pro_line = remove_tags(pro_line)
+        pro_line = remove_new_line(pro_line)
         pro_line = replace_slang(pro_line)
-        pro_line = replace_contraction(pro_line)
+        pro_line = replace_contraction(pro_line)        
+        pro_line = remove_tags(pro_line)
         pro_line = replace_emoji(pro_line)
         pro_line = convert_to_lowercase(pro_line)
-        pro_line = filter_digits(pro_line)
-        pro_line = replace_elongated(pro_line)
-        pro_line = separate_hashtags(pro_line)
-        pro_line = remove_new_line(pro_line)
-        processed_list.append(pro_line)
 
-    filename = filepath.split('/')[-1][:-4] + '_processed'
-    helpers.write_file(processed_list, filename)
+        # pro_line = lemmatize_verbs(pro_line)
+        # pro_line = stemming_using_Porter(pro_line)
+        # pro_line = remove_stopwords(pro_line)
+        
+        pro_line = separate_hashtags(pro_line)
+        pro_line = replace_numbers(pro_line)
+        pro_line = replace_elongated(pro_line)
+        pro_line = add_sentiment(pro_line)
+        processed_list.append(pro_line)
+    
+    helpers.write_file(processed_list, new_file, is_test)
 
 def return_processed_trainset_and_y(full_dataset=True, result_is_dataframe=False):
     if full_dataset:
@@ -101,6 +113,8 @@ def replace_elongated_word(word):
         based on wordnet of nltk to find the proper word without elongation
 	e.g. Goooodd -> Good
     '''
+    if len(re.findall('[^a-z]', word))!=0:
+        return word    
     if wordnet.synsets(word):
         return word + word
     elif is_elongated(word):
@@ -178,21 +192,12 @@ def remove_punctuation(text):
 def replace_exclamation(tweet):
     return re.sub('!((\s)?!)+', ' !! ', tweet)
 
+def reduce_white_spaces(tweet):
+    return re.sub('( )+', ' ', tweet).strip()
+
 # def pos_tag(tweet):
 #     tweet = nltk.word_tokenize(tweet.lower())
 #     return nltk.pos_tag(tweet)
-
-def separate_hashtags(tweet):
-    # TODO: Check if we want <hashtag> in the beginning
-    # slightly worst than without it in tfidf-csv_local-small_dataset
-    # but might be useful for NN
-    new_tokens = []
-    tokens = tweet.split(' ')
-    for token in tokens:
-        if token.startswith('#'): new_tokens.append(
-            '<hashtag> ' + hashtag.split_hashtag_to_words(token))
-        else: new_tokens.append(token)
-    return ' '.join(new_tokens)
 
 def convert_to_lowercase(text):
     '''
@@ -318,6 +323,6 @@ def separate_hashtags(tweet):
     tokens = tweet.split(' ')
     for token in tokens:
         if token.startswith('#'): new_tokens.append(
-            '<hashtag> ' + split_hashtag_to_words(token))
+            'hashtag ' + split_hashtag_to_words(token))
         else: new_tokens.append(token)
     return ' '.join(new_tokens)

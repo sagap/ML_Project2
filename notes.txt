@@ -1,3 +1,11 @@
+-setup glove and word2vec
+-Check with tfidf which is the best preprocessing
+-show learnign curve for our algorithms
+	train, test error
+
+
+
+
 untitled: foivos	
 Test-Preprocessing.ipynb : foivos
 BoW-Copy1: foivos
@@ -27,6 +35,36 @@ preproc they do:
 -numbers 
 -sentiment
 
+# def do_preprocessing(filepath, test_file=False):
+    
+#     initial_file = filepath.split('/')[-1]
+#     new_file = initial_file[:-4] + '_processed'
+#     print('preprocessing', initial_file)
+    
+#     with open(filepath, 'r') as f_in:
+#         lines = f_in.readlines()
+#         f_in.close()    
+#     # TODO remove it
+#     lines = lines [:2]
+    
+#     if test_file:
+#         lines = [line.split(',', 1)[1] for line in lines]
+    
+#     processed_list = []
+#     for line in tqdm(lines):
+#         pro_line = line
+#         pro_line = remove_tags(pro_line)
+#         pro_line = replace_slang(pro_line)
+#         pro_line = replace_contraction(pro_line)
+#         pro_line = replace_emoji(pro_line)
+#         pro_line = convert_to_lowercase(pro_line)
+#         pro_line = filter_digits(pro_line)
+#         pro_line = replace_elongated(pro_line)
+#         pro_line = separate_hashtags(pro_line)
+#         pro_line = remove_new_line(pro_line)
+#         processed_list.append(pro_line)
+
+#     helpers.write_file(processed_list, new_file, test_file)
 
 Emphasize emoji ---> show sentiment!!!!!
 

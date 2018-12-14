@@ -24,15 +24,17 @@ def logistic_regression_count_vectorizer(lines, threshold_pos_neg):
 
 
 
-def return_model(model):
-	''' provided the model that we want as parameter,
-		this function returns the corresponding model with the best possible parameters
-	 '''
-	if model == 'LR':
-		return LogisticRegression(max_iter=1000)
-	elif model == 'RF':
-		return RandomForestClassifier(n_estimators=100, max_depth=50)
-	elif model == 'NB':
-		return MultinomialNB()
-	elif model == 'SVM':
-		return SVC(probability=True)
+def get_estimator(model):
+    ''' provided the model that we want as parameter,
+        this function returns the corresponding model with the best possible parameters
+    '''
+    if model == 'LR':
+        return LogisticRegression(max_iter=1000, solver='sag')
+    elif model == 'RF':
+        return RandomForestClassifier(n_estimators=100, max_depth=50)
+    elif model == 'NB':
+        return MultinomialNB()
+    elif model == 'SVM':
+        return SVC(probability=True)
+    else:
+        raise ValueError('Invalid value ML algorithm')
