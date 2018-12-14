@@ -53,11 +53,9 @@ def do_preprocessing(filepath, is_test=False):
         pro_line = remove_tags(pro_line)
         pro_line = replace_emoji(pro_line)
         pro_line = convert_to_lowercase(pro_line)
-
         # pro_line = lemmatize_verbs(pro_line)
         # pro_line = stemming_using_Porter(pro_line)
         # pro_line = remove_stopwords(pro_line)
-        
         pro_line = separate_hashtags(pro_line)
         pro_line = replace_numbers(pro_line)
         pro_line = replace_elongated(pro_line)
