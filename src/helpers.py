@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import TfidfTransformer, TfidfVectorizer
 from sklearn.model_selection import cross_val_score, KFold
 from glove import Glove, Corpus
 import word2vec
-
+from keras.callbacks import ModelCheckpoint
 
 
 
@@ -86,11 +86,11 @@ def get_processed_data(full_dataset=False, result_is_dataframe=False):
     if result_is_dataframe:
         df = pd.DataFrame(train_data)
         df['sentiment'] = 1
-        df.loc[len(train_data):,'sentiment'] = -1
+        df.loc[len(train_data):,'sentiment'] = 0
         return df
     y = np.zeros(shape=(len(train_data)))
     y[:len(pos_lines)] = 1
-    y[len(pos_lines):] = -1
+    y[len(pos_lines):] = 0
     
     return train_data, y, test_data
 
@@ -135,7 +135,41 @@ def predict_and_save(clf, X_test):
 
     y_pred = clf.predict(X_test)
     assert len(y_pred)==10000, 'Number of predictions: ' + str(len(y_pred))
-    assert np.array_equal(np.unique(y_pred), [1, -1]) or np.array_equal(np.unique(y_pred), [-1, 1]) , (
+    assert np.array_equal(np.unique(y_pred), [1, 0]) or np.array_equal(np.unique(y_pred), [0, 1]) , (
             'Unique predicted labels: ' + str(np.unique(y_pred)))
 
     create_submission_csv(y_pred)
+
+def print_history(history):
+    # summarize history for accuracy
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+
+def checkpointing():
+    filepath_acc = DATA_INTERMEDIATE+"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
+    filepath_loss = DATA_INTERMEDIATE+"weights-improvement-{epoch:02d}-{val_loss:.2f}.hdf5"
+    checkpoint_acc = ModelCheckpoint(filepath_acc, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+    checkpoint_loss = ModelCheckpoint(filepath_loss, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+    return [checkpoint_acc, checkpoint_loss]
+
+def batch_generator(X, y, batch_size):
+    batch_per_epoch = int(X.shape[0]/batch_size)
+    index = np.arange(np.shape(y)[0])
+    batches_x = [X[batch_size*i:batch_size*(i+1)] for i in range(batch_per_epoch)]
+    batches_y = [y[batch_size*i:batch_size*(i+1)] for i in range(batch_per_epoch)]
+    while(True):
+        for counter in range(len(batches_x)):
+            yield batches_x[counter], batches_y[counter]
