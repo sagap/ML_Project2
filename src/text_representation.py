@@ -150,6 +150,3 @@ def create_feature_representation(feature_representation, max_features=1000):
 		return CountVectorizer()
 	elif feature_representation == 'TfidfVectorizer':
 		return TfidfVectorizer(stop_words=None, ngram_range=(1,2), sublinear_tf=True, max_features=max_features)
-	# elif feature_representation == 'Word2Vec'
-
-	# TODO
