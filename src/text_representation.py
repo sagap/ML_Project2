@@ -78,9 +78,15 @@ def train_glove_WE(train_data, test_data, full_dataset, predefined=False):
     
     return X_train, X_test
 
+def train_on_vectorizer(train_data, test_data, transformer_uri):
+    vectorizer = get_transformer(transformer_uri)
+    X_train = vectorizer.fit_transform(train_data)
+    X_test = vectorizer.transform(test_data)
+    return X_train, X_test
+
 def get_transformer(transformer_uri):
     if transformer_uri == 'tfidf':
-        return TfidfVectorizer(stop_words=None, ngram_range=(1,2), sublinear_tf=True, max_features=None)
+        return TfidfVectorizer(stop_words=None, ngram_range=(1,2), sublinear_tf=True, max_features=200)
     elif transformer_uri == 'count_vect':
         return CountVectorizer()
     else:

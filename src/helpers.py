@@ -11,7 +11,10 @@ from sklearn.model_selection import cross_val_score, KFold
 from glove import Glove, Corpus
 import word2vec
 from keras.callbacks import ModelCheckpoint
-
+import cross_validation as cv
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
 DATA = '../data/'
@@ -51,7 +54,7 @@ def write_file(tweet_list, filename, is_test=False):
                 f_out.write('{}\n'.format(preproc.reduce_white_spaces(tweet)))
                 
 def get_processed_data(full_dataset=False, result_is_dataframe=False):
-            
+    ''' '''
     pos_prefix = 'train_pos'
     neg_prefix = 'train_neg'
     if full_dataset:
@@ -96,15 +99,22 @@ def get_processed_data(full_dataset=False, result_is_dataframe=False):
 
 def transform_and_fit(train_data, y, test_data, text_representation='tfidf', 
                       ml_algorithm='LR', cross_val=False, full_dataset=False, predefined=False):
-    
+    ''' '''
     if text_representation not in ['glove', 'word2vec']:
-        clf = Pipeline([
+        if(ml_algorithm in ['NN', 'CNN']):
+            X_train, X_test = text_repr.train_on_vectorizer(train_data, test_data, text_representation)
+            if not cross_val :
+                model = create_and_fit_NN_model(X_train, y, 10, ml_algorithm, True)
+            else:
+                model = create_and_fit_NN_model(X_train, y, 10, ml_algorithm, False)           
+        else:
+            model = Pipeline([
             (text_representation, text_repr.get_transformer(text_representation)),
             (ml_algorithm, models.get_estimator(ml_algorithm))])
+            model.fit(train_data,y)
         print('Fit model...')
-        clf.fit(train_data,y)
-    else:
         
+    else:
         if text_representation == 'glove':
             X_train, X_test = text_repr.train_glove_WE(train_data, test_data, full_dataset, predefined)
         elif text_representation == 'word2vec':
@@ -113,29 +123,44 @@ def transform_and_fit(train_data, y, test_data, text_representation='tfidf',
         else:
             raise ValueError('Invalid value text representation method')
                   
-        print('Fit model...')       
-        clf = models.get_estimator(ml_algorithm)
-        clf.fit(X_train,y)
+        print('Fit model...')     
+        if ml_algorithm in ['NN', 'CNN']:
+            if not cross_val :
+                model = create_and_fit_NN_model(X_train, y, 10, ml_algorithm, True)
+            else:
+                model = create_and_fit_NN_model(X_train, y, 10, ml_algorithm, False)                
+        else:
+            model = models.get_estimator(ml_algorithm)
+            model.fit(X_train,y)
     
     if cross_val:
         print('Perform cross validation...')
-        kf = KFold(n_splits=4, shuffle=True, random_state=1)
-        if text_representation in ['glove', 'word2vec']:
-            scores = cross_val_score(clf, X_train, y, cv=kf, n_jobs=2) 
+        if ml_algorithm in ['NN', 'CNN']:
+            scores = cv.cross_validation_NN(model, X_train, y, 1)
+            print_history(scores)
         else:
-            scores = cross_val_score(clf, train_data, y, cv=kf, n_jobs=-1)
-        print("Accuracy: %0.4f (+/- %0.4f)" % (scores.mean(), scores.std() * 2))
-        
+            if text_representation in ['glove', 'word2vec']:
+                scores = cv.cross_validation(model, X_train, y , 4, 2)
+            else:
+                scores = cv.cross_validation(model, train_data, y , 4, 2)
+            print("Accuracy: %0.4f (+/- %0.4f)" % (scores.mean(), scores.std() * 2))
+
+    if ml_algorithm in ['NN', 'CNN']:
+        validate_model(X_train, y)
+        return model, X_test
     if text_representation in ['glove', 'word2vec']:
-        return clf, X_test
+        return model, X_test
     else:
-        return clf, test_data
+        return model, test_data
 
-def predict_and_save(clf, X_test):
-
-    y_pred = clf.predict(X_test)
+def predict_and_save(model, X_test, ml_algorithm):
+    if ml_algorithm in ['NN', 'CNN']:
+        y_pred = model.predict_classes(X_test)
+    else:
+        y_pred = model.predict(X_test)
+    y_pred[y_pred == 0] = -1
     assert len(y_pred)==10000, 'Number of predictions: ' + str(len(y_pred))
-    assert np.array_equal(np.unique(y_pred), [1, 0]) or np.array_equal(np.unique(y_pred), [0, 1]) , (
+    assert np.array_equal(np.unique(y_pred), [1, -1]) or np.array_equal(np.unique(y_pred), [-1, 1]) , (
             'Unique predicted labels: ' + str(np.unique(y_pred)))
 
     create_submission_csv(y_pred)
@@ -159,11 +184,11 @@ def print_history(history):
     plt.show()
 
 def checkpointing():
-    filepath_acc = DATA_INTERMEDIATE+"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
-    filepath_loss = DATA_INTERMEDIATE+"weights-improvement-{epoch:02d}-{val_loss:.2f}.hdf5"
-    checkpoint_acc = ModelCheckpoint(filepath_acc, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-    checkpoint_loss = ModelCheckpoint(filepath_loss, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-    return [checkpoint_acc, checkpoint_loss]
+#     filepath_acc = DATA_INTERMEDIATE+"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
+    filepath_loss = DATA_INTERMEDIATE+"weights-improvement-{epoch:02d}-{val_loss:.4f}--{val_acc:.4f}.hdf5"
+#     checkpoint_acc = ModelCheckpoint(filepath_acc, monitor='val_acc', verbose=1, save_best_only=False, mode='max')
+    checkpoint_loss = ModelCheckpoint(filepath_loss, monitor='val_loss', verbose=1, save_best_only=False, mode='min')
+    return [checkpoint_loss]
 
 def batch_generator(X, y, batch_size):
     batch_per_epoch = int(X.shape[0]/batch_size)
@@ -173,3 +198,19 @@ def batch_generator(X, y, batch_size):
     while(True):
         for counter in range(len(batches_x)):
             yield batches_x[counter], batches_y[counter]
+
+def create_and_fit_NN_model(X, y, epochs, ml_algorithm, should_fit=False):
+    ''' creates and compiles the NN model and fits '''
+    model = models.get_estimator(ml_algorithm, X.shape[1])
+    model = models.compile_model(model, 'Adam')
+    if should_fit:
+        result = model.fit(X, y, epochs=epochs, batch_size=32, verbose=2)
+    return model
+
+def validate_model(X, y):
+    ''' validate the model over 10k sample of the train set'''
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=10000, random_state=42)
+    #TODO load best model
+    temp_model = create_and_fit_NN_model(X_train, y_train, 5, 'NN', True)
+    y_pred = temp_model.predict_classes(X_test)
+    print('Accuracy on validation set: ',accuracy_score(y_test, y_pred))
