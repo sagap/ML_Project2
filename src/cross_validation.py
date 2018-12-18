@@ -12,14 +12,13 @@ def cross_validation(model, X_train, y , kf, n_splits=4, n_jobs=2):
     print("Accuracy: %0.4f (+/- %0.4f)" % (scores.mean(), scores.std() * 2))
     return scores
 
-def cross_validation_NN(model, X, y, num_of_iters):
+def cross_validation_NN(model, X, y):
     splits = np.random.random_integers(4, 6)
     kfold = KFold(n_splits=splits, shuffle=True, random_state=42)
-#     for i in range(1, num_of_iters):
     for train_index, test_index in kfold.split(X):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
-        result = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=1, batch_size=32, verbose=1, 
+        result = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=5, batch_size=32, verbose=2, 
                   callbacks=helpers.checkpointing())
     helpers.print_history(result)
     return result

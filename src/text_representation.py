@@ -13,6 +13,33 @@ DATA_INTERMEDIATE = '../data/intermediate/'
 DATA_TWITTER_DATASETS = '../data/twitter-datasets/'
 
 
+def define_tweet_max_len(train_data, full_dataset):
+    if full_dataset:
+        tweet_max_length = 130
+    else:
+        tweet_max_length = 80
+        
+    length = []
+    for x in train_data:
+        length.append(len(x.split()))    
+    print('{0}: max sentence length found, {1}: will be used'.format(max(length), tweet_max_length))
+    
+    return tweet_max_length
+    
+
+def define_num_words(train_data, full_dataset):
+    if full_dataset:
+        num_words = 120000
+    else:
+        num_words = 30000
+    vectorizer = CountVectorizer(min_df=2)
+    count_vect = vectorizer.fit_transform(train_data)
+    vocabulary = vectorizer.get_feature_names()
+    no_vocabulary = len(vocabulary)
+    print('{0}: num of words , {1}: will be used'.format(no_vocabulary, num_words))
+    
+    return num_words
+
 def get_features(vectorizer_uri, train_data, test_data, full_dataset, num_features=None):
     if vectorizer_uri == 'tfidf':
         vectorizer = TfidfVectorizer(stop_words=None, ngram_range=(1,2), sublinear_tf=True, max_features=num_features)
@@ -273,6 +300,14 @@ def get_embedding_matrix(train_data, word_embeddings, num_words):
             embedding_matrix[i] = embedding_vector
         
     return embedding_matrix, sequences
+
+def create_sequences(data, num_words):
+    tokenizer = Tokenizer(num_words=num_words, filters='', lower=False, split=' ',
+                      char_level=False, oov_token=None, document_count=0)
+    tokenizer.fit_on_texts(train_data)
+    sequences = tokenizer.texts_to_sequences(train_data)
+    
+    return sequences
 
 def train_on_vectorizer(train_data, test_data, transformer_uri):
     vectorizer = get_transformer(transformer_uri)

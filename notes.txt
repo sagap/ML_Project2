@@ -1,3 +1,9 @@
+Den moy aresoyn ta positive Negative, epireasmenos apo to sequence analysis in RNN
+einai san na vazoyme kati xierotero (to nltk) na apofasizei an kati einai thetiko h arnhtiko kai oxi to NN poy einai h doyleia toy ayth
+paradeigma 'negative not'
+
+I found how to get the dictionary of Keras tokenizer, it is in guys code about CNN  
+
 The best training accuracy is the second method (learn word embedding from scratch) at 90.52%. 
 !!!!!!!!!!!!!!!!!!!!
 
@@ -78,3 +84,26 @@ SMER preproc they do:
 -hashtag
 -numbers 
 -sentiment
+
+
+
+A multilayer perceptron (MLP) is a class of feedforward artificial neural network. An MLP consists of, at least, three layers of nodes: an input layer, a hidden layer and an output layer. Except for the input nodes, each node is a neuron that uses a nonlinear activation function. MLP utilizes a supervised learning technique called backpropagation for training.[1][2] Its multiple layers and non-linear activation distinguish MLP from a linear perceptron. It can distinguish data that is not linearly separable.[3]
+
+
+#loading the glove model
+def loadGloveModel(gloveFile):
+    print("Loading Glove Model")
+    f = open(gloveFile,'r')
+    model = {}
+    for line in f:
+        splitLine = line.split()
+        word = splitLine[0]
+        embedding = [float(val) for val in splitLine[1:]]
+        model[word] = embedding
+    print ("Done."),len(model),(" words loaded!")
+    return model
+
+# save the glove model
+model=loadGloveModel("/mnt/hdd/datasets/glove/glove.twitter.27B.200d.txt")
+
+!!!!!!!!!!! Kai glitwnw teleiws apo to gamw glove 
