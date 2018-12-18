@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import TfidfTransformer, TfidfVectorizer
 from sklearn.model_selection import cross_val_score, KFold
 from glove import Glove, Corpus
 import word2vec
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 import cross_validation as cv
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -104,9 +104,10 @@ def transform_and_fit(train_data, y, test_data, text_representation='tfidf',
         if(ml_algorithm in ['NN', 'CNN']):
             X_train, X_test = text_repr.train_on_vectorizer(train_data, test_data, text_representation)
             if not cross_val :
-                model = create_and_fit_NN_model(X_train, y, 10, ml_algorithm, True)
+                model = create_and_fit_NN_model(X_train, y, 3, ml_algorithm, True)
+            # if cross_val == True then we perform cross-validation for the neural network
             else:
-                model = create_and_fit_NN_model(X_train, y, 10, ml_algorithm, False)           
+                model = create_and_fit_NN_model(X_train, y, 3, ml_algorithm, False)           
         else:
             model = Pipeline([
             (text_representation, text_repr.get_transformer(text_representation)),
@@ -126,9 +127,10 @@ def transform_and_fit(train_data, y, test_data, text_representation='tfidf',
         print('Fit model...')     
         if ml_algorithm in ['NN', 'CNN']:
             if not cross_val :
-                model = create_and_fit_NN_model(X_train, y, 10, ml_algorithm, True)
+                print('Fit the NN model')
+                model = create_and_fit_NN_model(X_train, y, 3, ml_algorithm, True)
             else:
-                model = create_and_fit_NN_model(X_train, y, 10, ml_algorithm, False)                
+                model = create_and_fit_NN_model(X_train, y, 3, ml_algorithm, False)                
         else:
             model = models.get_estimator(ml_algorithm)
             model.fit(X_train,y)
@@ -184,11 +186,12 @@ def print_history(history):
     plt.show()
 
 def checkpointing():
-#     filepath_acc = DATA_INTERMEDIATE+"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
-    filepath_loss = DATA_INTERMEDIATE+"weights-improvement-{epoch:02d}-{val_loss:.4f}--{val_acc:.4f}.hdf5"
-#     checkpoint_acc = ModelCheckpoint(filepath_acc, monitor='val_acc', verbose=1, save_best_only=False, mode='max')
-    checkpoint_loss = ModelCheckpoint(filepath_loss, monitor='val_loss', verbose=1, save_best_only=False, mode='min')
-    return [checkpoint_loss]
+    filepath_acc = DATA_INTERMEDIATE+"best_on_acc.hdf5"
+    filepath_loss = DATA_INTERMEDIATE+"best_on_loss.hdf5"
+    checkpoint_acc = ModelCheckpoint(filepath_acc, monitor='val_acc', verbose=0, save_best_only=True, mode='max')
+    checkpoint_loss = ModelCheckpoint(filepath_loss, monitor='val_loss', verbose=0, save_best_only=True, mode='min')
+    early_stop = EarlyStopping(monitor='val_acc', patience=5, mode='max') 
+    return [checkpoint_acc, checkpoint_loss, early_stop]
 
 def batch_generator(X, y, batch_size):
     batch_per_epoch = int(X.shape[0]/batch_size)
@@ -199,18 +202,24 @@ def batch_generator(X, y, batch_size):
         for counter in range(len(batches_x)):
             yield batches_x[counter], batches_y[counter]
 
-def create_and_fit_NN_model(X, y, epochs, ml_algorithm, should_fit=False):
+def create_and_fit_NN_model(X, y, ml_algorithm, epochs, should_fit=False, callbacks=None):
     ''' creates and compiles the NN model and fits '''
     model = models.get_estimator(ml_algorithm, X.shape[1])
     model = models.compile_model(model, 'Adam')
     if should_fit:
-        result = model.fit(X, y, epochs=epochs, batch_size=32, verbose=2)
+        result = model.fit(X, y, epochs=epochs, batch_size=32, verbose=2, callbacks=callbacks)
     return model
 
 def validate_model(X, y):
-    ''' validate the model over 10k sample of the train set'''
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=10000, random_state=42)
+    ''' validate the model over 10k sample of the train set and save the best checkpoints'''
+    print('Now validate model over 10k samples...')
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
     #TODO load best model
-    temp_model = create_and_fit_NN_model(X_train, y_train, 5, 'NN', True)
-    y_pred = temp_model.predict_classes(X_test)
-    print('Accuracy on validation set: ',accuracy_score(y_test, y_pred))
+    model_to_perform_validation = create_and_fit_NN_model(X_train, y_train, 'NN', 5, False)
+    result = model_to_perform_validation.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=5, batch_size=32, verbose=2, callbacks=checkpointing())
+    
+def load_best_model(X, y, ml_algorithm, filepath):
+    model = models.get_estimator(ml_algorithm, X.shape[1])
+    model.load_weights(DATA_INTERMEDIATE+"best_on_acc.hdf5")
+    model = models.compile_model(model, 'Adam')
+    return model
