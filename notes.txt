@@ -1,20 +1,64 @@
--setup glove and word2vec
--Check with tfidf which is the best preprocessing
--show learnign curve for our algorithms
-	train, test error
+The best training accuracy is the second method (learn word embedding from scratch) at 90.52%. 
+!!!!!!!!!!!!!!!!!!!!
+
+
+
+conv-relu-conv-relu-pool
+
+Convolutional networks may include local or global pooling layers,[clarification needed] which combine the outputs of neuron clusters at one layer into a single neuron in the next layer.[10][11] For example, max pooling uses the maximum value from each of a cluster of neurons at the prior layer.[12] Another example is average pooling, which uses the average value from each of a cluster of neurons at the prior layer.[13]
+??which and why??
+
+
+
+Now we are done with the data preparation. Before we jump into CNN, I would like to test one more thing (sorry for the delay). When we feed this sequential vector representation of data, we will use Embedding layer in Keras. With Embedding layer, I can either pass pre-defined embedding, which I prepared as ‘embedding_matrix’ above, or Embedding layer itself can learn word embeddings as the whole model trains. And another possibility is we can still feed the pre-defined embedding but make it trainable so that it will update the values of vectors as the model trains.
+
+find the max-lenght of a tweet
+
+-Use dropout? yes, no and why
+- which activation functions and why
+-same for learning rate
+
+
+-Use pandas cols = 'text', 'label' so as when split to get the correct label
+- Should we add the label immediately after processing the line? Not-necessary (is dobe correctly)
+
+
+
+For glove!!!!!!!
+for i, line in enumerate(open('data/wiki-news-300d-1M.vec')):
+    values = line.split()
+    embeddings_index[values[0]] = numpy.asarray(values[1:], dtype='float32')
+
+
+# convert text to sequence of tokens and pad them to ensure equal length vectors 
+train_seq_x = sequence.pad_sequences(token.texts_to_sequences(train_x), maxlen=70)
+valid_seq_x = sequence.pad_sequences(token.texts_to_sequences(valid_x), maxlen=70)
+
+
+For example, it may no-longer make sense to stem words or remove punctuation for contractions.
+
+At the output layer, we have only one neuron as we are solving a binary classification problem (predict 0 or 1). We could also have two neurons for predicting each of both classes.
+	wh as weight matrix to the hidden layer
+	bh as bias matrix to the hidden layer
+	wout as weight matrix to the output layer
+	bout as bias matrix to the output layer
+
+
+
+---------
+- Emphasize emoji ---> show sentiment!!!!!
+- words in asterisks
+- : l
+- There are repeated tweets - //TODO: check this
+
+- Experiment history. If we do not like a result the solution is to improve the model - not to avoid include it in the report
+- FastText?
+- Validation: Particle Swarm Model Selection (PSO) ??
 
 
 
 
-untitled: foivos	
-Test-Preprocessing.ipynb : foivos
-BoW-Copy1: foivos
-BoW: stelios keep
-BoW_preproc: stelios keeep
-
-
-preproc they do:
-
+SMER preproc they do:
 -elongated
 -contraction:
     tweets = tweets.str.replace('n\'t', ' not', case=False)
@@ -34,103 +78,3 @@ preproc they do:
 -hashtag
 -numbers 
 -sentiment
-
-# def do_preprocessing(filepath, test_file=False):
-    
-#     initial_file = filepath.split('/')[-1]
-#     new_file = initial_file[:-4] + '_processed'
-#     print('preprocessing', initial_file)
-    
-#     with open(filepath, 'r') as f_in:
-#         lines = f_in.readlines()
-#         f_in.close()    
-#     # TODO remove it
-#     lines = lines [:2]
-    
-#     if test_file:
-#         lines = [line.split(',', 1)[1] for line in lines]
-    
-#     processed_list = []
-#     for line in tqdm(lines):
-#         pro_line = line
-#         pro_line = remove_tags(pro_line)
-#         pro_line = replace_slang(pro_line)
-#         pro_line = replace_contraction(pro_line)
-#         pro_line = replace_emoji(pro_line)
-#         pro_line = convert_to_lowercase(pro_line)
-#         pro_line = filter_digits(pro_line)
-#         pro_line = replace_elongated(pro_line)
-#         pro_line = separate_hashtags(pro_line)
-#         pro_line = remove_new_line(pro_line)
-#         processed_list.append(pro_line)
-
-#     helpers.write_file(processed_list, new_file, test_file)
-
-Emphasize emoji ---> show sentiment!!!!!
-
-words in asterisks
-
------0. General Info-----
-
-import nltk, nltk.download('wordnet')
-- haaappyyyy
-- : l
-- There are repeated tweets - //TODO: check this
-- All tweets have been tokenized already, so that the words and punctuation are properly separated by a whitespace.
-- the labels indicate if a tweet used to contain a :) or :( smiley. (1 or -1)
-- Allowed to use scikit-learn and external libraries
-- Each participant 5 submissions per day(10 per team). Wrong submission file format do not count.
-- Metric: Misclassification error score. Accuracy
-
-
-
------1. Preprocessing-----
-
-- No Preprocessing in the 1st run
-
-
------2. Text representation-----
-
-- Naive-first approach:
-  Load the training tweets and the built GloVe word embeddings. Using the word embeddings, construct a feature representation of each training tweet (by averaging the word vectors over all words of the tweet).
-
-
-
-
------3. Train a Linear Classifier----- 
-
-- 1. Logistic regression - scikit-learn
-- 2. SVM  - scikit-learn
-
-
-
------4. Prediction - Submission/Evaluation-----
-
-- Memory errors when run full dataset locally => need more powerful computer
-- Very important to build again accurate local testing
-- Experiment history. If we do not like a result the solution is to improve the model - not to avoid include it in the report
-
-
-
------ Notes about the project---
-
-lemmatization and stemming)
-
-1. Preprocessing
-- contractions expansion: don't -> do (check if have been separated in the tokenization phase)
-- Emojis Transformation: check if we have
-- check if we have hashtags - if yes: split word
-- POS Tagging is it necessary? -> yes for lemmatization
-
-
-2. Text Representation
-- word embeddings
-- tweet embeddings
-- bag of words
-- pagraph embeddings
-
-3. ML algorithms            IMPORTANT give your ml method as argument in the method and let it compute the accuracy
-- Naive bayes. should we??
-- FastText?
-- Neural Network (Convolutional) 
-- Validation: Particle Swarm Model Selection (PSO) ??

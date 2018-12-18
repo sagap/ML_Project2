@@ -152,15 +152,27 @@ def represents_float(s):
     except ValueError:
         return False
 
+# def replace_numbers(tweet):
+#     new_tokens = []
+#     tokens = tweet.split(' ')
+#     for token in tokens:
+#         inter_token = re.sub('[,.:%_\+\-\*\/\%_]', '', token)
+#         if represents_float(inter_token):
+#             new_tokens.append('number')
+#         else:
+#             new_tokens.append(token)
+#     return ' '.join(new_tokens)
+
 def replace_numbers(tweet):
     new_tokens = []
     tokens = tweet.split(' ')
     for token in tokens:
-        inter_token = re.sub('[,.:%_\+\-\*\/\%_]', '', token)
-        if represents_float(inter_token):
+        intermed_token = re.sub('[,.:%_\+\-\*\/\%_]', '', token)
+        if represents_float(intermed_token):
             new_tokens.append('number')
         else:
-            new_tokens.append(token)
+            if not re.findall('[0-9]', token):
+                new_tokens.append(token)
     return ' '.join(new_tokens)
 
 def stemming_using_Porter(text):
