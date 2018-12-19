@@ -336,11 +336,15 @@ def fit_tokenizer(train_data, num_words):
     tokenizer.fit_on_texts(train_data)
     return tokenizer
 
-def create_sequences(data, num_words):
-    tokenizer = Tokenizer(num_words=num_words, filters='', lower=False, split=' ',
-                      char_level=False, oov_token=None, document_count=0)
+def fit_tokenizer(train_data, num_words):
+    ''' data is always train_data'''
+    tokenizer = Tokenizer(num_words=num_words, filters='', lower=False, split=' ', char_level=False, oov_token=None, document_count=0)
     tokenizer.fit_on_texts(train_data)
-    sequences = tokenizer.texts_to_sequences(train_data)
+    return tokenizer
+
+def create_sequences(data, num_words):
+    
+    sequences = tokenizer.texts_to_sequences(data)
     
     return sequences
 
