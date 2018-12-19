@@ -1,3 +1,7 @@
+This GloVe dataset includes all the transformed
+words, such as ’positive’, <sadface>’,
+
+
 Den moy aresoyn ta positive Negative, epireasmenos apo to sequence analysis in RNN
 einai san na vazoyme kati xierotero (to nltk) na apofasizei an kati einai thetiko h arnhtiko kai oxi to NN poy einai h doyleia toy ayth
 paradeigma 'negative not'

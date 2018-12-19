@@ -12,6 +12,35 @@ DATA_UTILS = '../data/utils/'
 DATA_INTERMEDIATE = '../data/intermediate/'
 DATA_TWITTER_DATASETS = '../data/twitter-datasets/'
 
+def loadGloveModel(gloveFile):
+    print("Loading Glove Word Embeddings")
+    with open(gloveFile,'r') as f:
+        lines = f.readlines()       
+        word_embeddings = {}
+        for line in f:
+            word = line.split(' ', 1)[0]
+            embedding_vector = np.array([float(x) for x in line.split(' ', 1)[1].split()])
+            word_embeddings[word] = embedding
+        return word_embeddings
+    
+def fit_tokenizer(train_data, num_words):
+    tokenizer = Tokenizer(num_words=num_words, filters='', lower=False, split=' ',
+                      char_level=False, oov_token=None, document_count=0)
+    tokenizer.fit_on_texts(train_data)
+    return tokenizer
+
+def get_embedding_matrix(tokenizer, word_embeddings, num_words):
+    embedding_matrix = np.zeros((num_words, 200))
+    for word, i in tokenizer.word_index.items():
+        if i >= num_words:
+            continue
+        if word in word_embeddings:
+            embedding_vector = word_embeddings[word]
+        else:
+            embedding_vector = np.zeros(200)
+        embedding_matrix[i] = embedding_vector
+        
+    return embedding_matrix
 
 def define_tweet_max_len(train_data, full_dataset):
     if full_dataset:
@@ -285,21 +314,27 @@ def TE_from_mean_WE(tweet_list, vocab_dict, num_of_features):
         
     return all_features
 
-def get_embedding_matrix(train_data, word_embeddings, num_words):
-    tokenizer = Tokenizer(num_words=num_words, filters='', lower=False, split=' ',
-                          char_level=False, oov_token=None, document_count=0)
-    tokenizer.fit_on_texts(train_data)
-    sequences = tokenizer.texts_to_sequences(train_data)
+# def get_embedding_matrix(train_data, word_embeddings, num_words):
+#     tokenizer = Tokenizer(num_words=num_words, filters='', lower=False, split=' ',
+#                           char_level=False, oov_token=None, document_count=0)
+#     tokenizer.fit_on_texts(train_data)
+#     sequences = tokenizer.texts_to_sequences(train_data)
 
-    embedding_matrix = np.zeros((num_words, 200))
-    for word, i in tokenizer.word_index.items():
-        if i >= num_words:
-            continue
-        embedding_vector = word_embeddings[word]
-        if embedding_vector is not None:
-            embedding_matrix[i] = embedding_vector
+#     embedding_matrix = np.zeros((num_words, 200))
+#     for word, i in tokenizer.word_index.items():
+#         if i >= num_words:
+#             continue
+#         embedding_vector = word_embeddings[word]
+#         if embedding_vector is not None:
+#             embedding_matrix[i] = embedding_vector
         
-    return embedding_matrix, sequences
+#     return embedding_matrix, sequences
+
+def fit_tokenizer(train_data, num_words):
+    tokenizer = Tokenizer(num_words=num_words, filters='', lower=False, split=' ',
+                      char_level=False, oov_token=None, document_count=0)
+    tokenizer.fit_on_texts(train_data)
+    return tokenizer
 
 def create_sequences(data, num_words):
     tokenizer = Tokenizer(num_words=num_words, filters='', lower=False, split=' ',
