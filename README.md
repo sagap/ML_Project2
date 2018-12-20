@@ -31,7 +31,7 @@ You should run the script with Python 3 and also you need to install the followi
 * [Train and Test Datasets](https://www.crowdai.org/challenges/epfl-ml-text-classification/dataset_files)
 	 please move the three datasets under 'data/twitter-datasets/'
 
-* To avoid the preprocessing phase you shall download the preprocessed tweets of the full dataset from this [link]()
+* To avoid the preprocessing phase you shall download the preprocessed tweets of the full dataset from this [link](https://drive.google.com/open?id=1OKkMXY3lN882cOKeEKqHlscyZ09kSMWh)
 As soon as you have the files: train_neg_full_processed.txt, train_pos_full_processed.txt and test_data_processed.txt , please move them under 'data/intermediate/'
 
 * To run our pipeline from *scratch* and reproduce the best score you should download the pre-trained word Vectors for twitter from Stanford:
@@ -40,7 +40,7 @@ As soon as you have the files: train_neg_full_processed.txt, train_pos_full_proc
 	unzip data/twitter-datasets/glove.twitter.27B.zip -d data/twitter-datasets/
 	```
 
-* Also, to *avoid running our model from scratch* you can download the model from this [link]() and move the file under 'data/intermediate/'
+* Also, to *avoid running our model from scratch* you can download the model from this [link](https://drive.google.com/open?id=1V_xtWUOGT5Qa3uc8sB9hfQDbbczHQ-Fg) and move the file under 'data/intermediate/'
 
 ## Hardware Requirements
 
