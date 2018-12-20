@@ -8,7 +8,7 @@ import text_representation as text_repr
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfTransformer, TfidfVectorizer
 from sklearn.model_selection import cross_val_score, KFold
-from glove import Glove, Corpus
+# from glove import Glove, Corpus
 import word2vec
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 import cross_validation as cv
@@ -168,22 +168,19 @@ def predict_and_save(model, X_test, ml_algorithm):
     create_submission_csv(y_pred)
 
 def print_history(history):
-    # summarize history for accuracy
+    # plot accuracy of train-validation set, after fit to an Neural Network
     plt.plot(history.history['acc'])
     plt.plot(history.history['val_acc'])
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
+    fig1 = plt.gcf()
     plt.show()
-    # summarize history for loss
+    fig1.savefig('plot_acc.png')
+    plt.show()
+    # plot loss of train-validation set, after fit to an Neural Network
     plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
 
 def checkpointing():
     filepath_acc = DATA_INTERMEDIATE+"best_on_acc.hdf5"
