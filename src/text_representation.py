@@ -13,6 +13,8 @@ DATA_INTERMEDIATE = '../data/intermediate/'
 DATA_TWITTER_DATASETS = '../data/twitter-datasets/'
 
 def loadGloveModel(gloveFile):
+    ''' function that loads word embeddings derived from glove file
+    '''
     print("Loading Glove Word Embeddings")
     with open(gloveFile,'r') as f:
         lines = f.readlines()       
@@ -24,6 +26,12 @@ def loadGloveModel(gloveFile):
         return word_embeddings
     
 def fit_tokenizer(train_data, num_words):
+    ''' params: train_data: train set tweets
+                num_words: number of words in vocabulary
+        returns: keras Tokenizer
+
+        description: Keras Tokenizer splits tweets in words
+    '''
     tokenizer = Tokenizer(num_words=num_words, filters='', lower=False, split=' ',
                       char_level=False, oov_token=None, document_count=0)
     tokenizer.fit_on_texts(train_data)
@@ -43,6 +51,9 @@ def get_embedding_matrix(tokenizer, word_embeddings, num_words):
     return embedding_matrix
 
 def define_tweet_max_len(train_data, full_dataset):
+    ''' function that is used to find the maximum length of a tweet,
+        of course we choose an optimal value, depending on the size of the dataset given as parameter
+    '''
     if full_dataset:
         tweet_max_length = 130
     else:
@@ -57,6 +68,9 @@ def define_tweet_max_len(train_data, full_dataset):
     
 
 def define_num_words(train_data, full_dataset):
+    ''' function that uses CounVectorizer to find the number of words of the vocabulary
+        then then return the number of words that we choose to use, according to the size of the dataset
+    '''
     if full_dataset:
         num_words = 120000
     else:

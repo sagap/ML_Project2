@@ -31,13 +31,16 @@ def create_submission_csv(y_pred):
             writer.writerow({'Id':int(r1),'Prediction':int(r2)})
             
 def write_dict(input_dict, file):
+    ''' create csv file from dictionary'''
     with open(DATA_INTERMEDIATE + file, 'w') as csv_file:
         writer = csv.writer(csv_file)
         for key, value in input_dict.items():
             writer.writerow([key, value])
 
 def create_dict_from_csv(csv_path):
-    '''create contractions dict from the corresponding csv'''
+    ''' create dict from the corresponding csv
+        returns: the dictionary created
+    '''
     reader = csv
     with open(csv_path) as f:
         reader = csv.reader(f)
@@ -45,6 +48,10 @@ def create_dict_from_csv(csv_path):
         return result
     
 def write_file(tweet_list, filename, is_test=False):
+    '''  function that provided a list of tweets it writes them to a file and stores the file 
+         under '/data/intermediate/'
+         e.g. this function is invoked when the preprocessing is finished in order to save the processed tweets in files
+    '''
     with open(DATA_INTERMEDIATE + '{file}.txt'.format(file=filename), 'w') as f_out:
         if is_test:
             for index, tweet in enumerate(tweet_list):
@@ -54,7 +61,16 @@ def write_file(tweet_list, filename, is_test=False):
                 f_out.write('{}\n'.format(preproc.reduce_white_spaces(tweet)))
                 
 def get_processed_data(full_dataset=False, result_is_dataframe=False):
-    ''' '''
+    ''' 
+        param: 
+            full_dataset: full_dataset for True or small dataset for False  
+            result_is_dataframe: if True returns the processed data in dataframe
+
+        returns: processed data
+
+        description: if processed files exist in 'data/intermediate/' they are fetched 
+                     otherwise do_preprocessing() preprocesses raw tweets
+    '''
     pos_prefix = 'train_pos'
     neg_prefix = 'train_neg'
     if full_dataset:
@@ -156,7 +172,10 @@ def transform_and_fit(train_data, y, test_data, text_representation='tfidf',
         return model, test_data
 
 def predict_and_save(model, X_test, ml_algorithm):
-    if ml_algorithm in ['NN', 'CNN']:
+    ''' function that predicts 
+        
+    '''
+    if ml_algorithm in ['NN', 'CNN', 'LSTM']:
         y_pred = model.predict_classes(X_test)
     else:
         y_pred = model.predict(X_test)
@@ -168,6 +187,9 @@ def predict_and_save(model, X_test, ml_algorithm):
     create_submission_csv(y_pred)
 
 def print_history(history):
+    ''' function used to print the history after fit 
+        to plot the accuracy and the loss of train-test set
+    '''
     # plot accuracy of train-validation set, after fit to an Neural Network
     plt.plot(history.history['acc'])
     plt.plot(history.history['val_acc'])
@@ -178,19 +200,31 @@ def print_history(history):
     fig1 = plt.gcf()
     plt.show()
     fig1.savefig('plot_acc.png')
-    plt.show()
     # plot loss of train-validation set, after fit to an Neural Network
     plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    fig2 = plt.gcf()
+    plt.show()
+    fig2.savefig('plot_loss.png')
 
 def checkpointing():
-    filepath_acc = DATA_INTERMEDIATE+"best_on_acc.hdf5"
-    filepath_loss = DATA_INTERMEDIATE+"best_on_loss.hdf5"
+    ''' function that returns a list of callbacks for the fit function of keras model,
+    '''
+    filepath_acc = DATA_INTERMEDIATE+"best.weights.acc.hdf5"
+    filepath_loss = DATA_INTERMEDIATE+"best.weights.loss.hdf5"
     checkpoint_acc = ModelCheckpoint(filepath_acc, monitor='val_acc', verbose=0, save_best_only=True, mode='max')
     checkpoint_loss = ModelCheckpoint(filepath_loss, monitor='val_loss', verbose=0, save_best_only=True, mode='min')
     early_stop = EarlyStopping(monitor='val_acc', patience=5, mode='max') 
     return [checkpoint_acc, checkpoint_loss, early_stop]
 
 def batch_generator(X, y, batch_size):
+    ''' function that is used for testing purposes
+        generates batches from X, y according to the batch size
+    '''
     batch_per_epoch = int(X.shape[0]/batch_size)
     index = np.arange(np.shape(y)[0])
     batches_x = [X[batch_size*i:batch_size*(i+1)] for i in range(batch_per_epoch)]

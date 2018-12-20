@@ -32,7 +32,10 @@ contractions_regexp = re.compile('(%s)' % '|'.join(contractions.keys()))
 elongated_regex = re.compile(r"(.)\1{1}")
 
 def do_preprocessing(filepath, is_test=False):
-    
+    ''' 
+        params: filepath: which file of tweets to perform preprocessing on
+        
+    '''    
     initial_file = filepath.split('/')[-1]
     new_file = initial_file[:-4] + '_processed'
     print('preprocessing', initial_file)
@@ -278,7 +281,11 @@ def penn_to_wn(tag):
     return None
 
 def add_sentiment(tweet):
- 
+    ''' function that adds the word 'positive' or 'negative' to the tweet
+        depending on the sentiment of the word, obtained from WordNetLemmatizer
+
+        this is a way of giving emphasis to the sentiment of a tweet 
+    ''' 
     new_tweet = []  
     tagged_tweet = pos_tag(word_tokenize(tweet))
 
@@ -324,12 +331,14 @@ def split_hashtag_to_words(hashtag):
     except: return hashtag[1:]
 
 def infer_spaces(s):
-    """Uses dynamic programming to infer the location of spaces in a string
-    without spaces."""
+    ''' Uses dynamic programming to infer the location of spaces in a string
+        without spaces.
 
-    # Find the best match for the i first characters, assuming cost has
-    # been built for the i-1 first characters.
-    # Returns a pair (match_cost, match_length).
+        Find the best match for the i first characters, assuming cost has
+        been built for the i-1 first characters.
+        Returns a pair (match_cost, match_length).
+    '''
+
     def best_match(i):
         candidates = enumerate(reversed(cost[max(0, i-maxword):i]))
         return min((c + wordcost.get(s[i-k-1:i], 9e999), k+1) for k,c in candidates)
@@ -356,9 +365,11 @@ def infer_spaces(s):
     return " ".join(reversed(out))
 
 def separate_hashtags(tweet):
-    # TODO: Check if we want <hashtag> in the beginning
-    # slightly worst than without it in tfidf-csv_local-small_dataset
-    # but might be useful for NN
+    ''' function that is used to separate the '#' from the words
+        inside this function there is an invocation of split_hashtag_to_words 
+        
+        eg. 
+    '''
     new_tokens = []
     tokens = tweet.split(' ')
     for token in tokens:
