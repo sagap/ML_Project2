@@ -45,7 +45,7 @@ def do_preprocessing(filepath, is_test=False):
         lines = [line.split(',', 1)[1] for line in lines]
     
     processed_list = []
-    for line in tqdm(lines):
+    for line in lines:
         pro_line = line
         pro_line = remove_new_line(pro_line)
         pro_line = replace_slang(pro_line)
@@ -114,7 +114,7 @@ def replace_elongated_word(word):
     if len(re.findall('[^a-z]', word))!=0:
         return word    
     if wordnet.synsets(word):
-        return word + word
+        return word + " " + word 
     elif is_elongated(word):
         return replace_elongated_word(elongated_regex.sub(r'\1', word))
     return word
@@ -125,24 +125,54 @@ def remove_tags(text):
 def remove_new_line(text):
     return re.sub(r'\n', '', text)
 
+# def replace_emoji(text):
+#     rep_text = text
+#     rep_text = re.sub(':(-)?@', ' angryface emoji ', rep_text)
+#     rep_text = re.sub(':( )?\$', ' blushing face emoji ', rep_text)
+#     rep_text = re.sub('>:\)|>:D|>:-D|>;\)|>:-\)|}:-\)|}:\)|3:-\)|3:\)', ' devil emoji ', rep_text) #done
+#     rep_text = re.sub('O:-\)|0:-3|0:3|0:-\)|0:\)|0;^\)', ' angelface emoji ', rep_text)
+#     rep_text = re.sub(':( )?‑( )?\||:( )?\|', 'straightface emoji ', rep_text)
+#     rep_text = re.sub(':( )?\)+|\(+:|:-\)+|\(+-:|:\}| c : |:( )?O( )?\)|:( )?-( )?]|^( )?-( )?^', ' happyface emoji ',
+#                       rep_text, flags=re.I)
+#     rep_text = re.sub(
+#         ':-D|:D|=D|=-D|8-D|8D|x-D|xD|X-D|=-D|:( )?d|:-d|>:d|=3|=-3|:\'-\)|:\'\)|\(\':|\[:|:\]', ' happyface emoji ', rep_text)    
+#     rep_text = re.sub('\)+:|:\(+|:-\(+|\)+-:|>:\[| : c |:\||:-\[', ' sadface emoji ', rep_text)
+#     rep_text = re.sub(':( )?\*|:( )?-( )?\*+|:x', ' kissyface emoji ', rep_text, flags=re.I) 
+#     rep_text = re.sub('<3', ' heart emoji ', rep_text)
+#     rep_text = re.sub(';( )?-( )?\)|;( )?\)|\*\)|\*-\)|;( )?-( )?\]|;( )?]|;( )?D|;\^\)', ' winkyface emoji ', rep_text)
+#     rep_text = re.sub('>:P|:-P|:P|X-P|xp|=p|:b|:-b|;p| : p ', ' tongue emoji ', rep_text, flags=re.I)
+#     rep_text = re.sub('>:O|:( )?-( )?O|:( )?O', ' surprise emoji ', rep_text, flags=re.I) #done
+#     rep_text = re.sub(
+#     '<:-\||>( )?.( )?<|:( )?-( )?\/|:( )?-( )?\\\\|:S|:( )?\/|=\/|=( )?\\\\|:( )?\\\\|:( )?-( )?s|;( )?/|:( )?l ',
+#     ' skeptical emoji ', rep_text) #done
+#     return rep_text
+
 def replace_emoji(text):
     rep_text = text
-    rep_text = re.sub(':(-)?@', ' angry_emoji ', rep_text)
-    rep_text = re.sub(':( )?\$', ' blushing_emoji ', rep_text)
-    rep_text = re.sub('>:\)|>:D|>:-D|>;\)|>:-\)|}:-\)|}:\)|3:-\)|3:\)', ' devil_emoji ', rep_text) #done
-    rep_text = re.sub('O:-\)|0:-3|0:3|0:-\)|0:\)|0;^\)', ' angel_emoji ', rep_text)
-    rep_text = re.sub(':( )?\)+|\(+:|:-\)+|\(+-:|:\}| c : |:( )?O( )?\)|:( )?-( )?]|^( )?-( )?^', ' happy_emoji ', rep_text, flags=re.I)
+    rep_text = re.sub(':( )?@|:( )?-( )?@', ' angryface emoji ', rep_text)
+    rep_text = re.sub(':( )?\$', ' blushing face emoji ', rep_text)
+    rep_text = re.sub('>:\)|>:D|>:-D|>;\)|>:-\)|}:-\)|}:\)|3( )?:( )?-( )?\)|3( )?:( )?\)', ' devil emoji ',
+                      rep_text) #done
+    rep_text = re.sub('O( )?:( )?-( )?\)|0( )?:( )?-( )?3|0( )?:( )?3|0( )?:( )?-( )?\)|0( )?:( )?\)|0( )?;( )?^\)',
+                      ' angelface emoji ', rep_text)
+    rep_text = re.sub(':( )?-( )?\||:( )?\|', 'straightface emoji ', rep_text)
+    rep_text = re.sub(':( )?\)+|\(+( )?:|:( )?-( )?\)+|\(+( )?-( )?:|:( )?\}| c : |:( )?O( )?\)|:( )?-( )?]|^( )?-( )?^',
+                      ' happyface emoji ', rep_text, flags=re.I)
     rep_text = re.sub(
-        ':-D|:D|=D|=-D|8-D|8D|x-D|xD|X-D|=-D|:( )?d|:-d|>:d|=3|=-3|:\'-\)|:\'\)|\(\':|\[:|:\]', ' happy_emoji ', rep_text)    
-    rep_text = re.sub('\)+:|:\(+|:-\(+|\)+-:|>:\[| : c |:\||:-\[', ' sad_emoji ', rep_text)
-    rep_text = re.sub(':( )?\*|:( )?-( )?\*+|:x', ' kiss_emoji ', rep_text, flags=re.I) 
-    rep_text = re.sub('<3', ' heart ', rep_text)
-    rep_text = re.sub(';-\)|;\)|\*\)|\*-\)|;-\]|;]|;D|;\^\)', ' wink_emoji ', rep_text)
-    rep_text = re.sub('>:P|:-P|:P|X-P|xp|=p|:b|:-b|;p| : p ', ' tongue_emoji ', rep_text, flags=re.I)
-    rep_text = re.sub('>:O|:( )?-( )?O|:( )?O', ' surprise_emoji ', rep_text, flags=re.I) #done
+        ':( )?-( )?D|:( )?D|=( )?D|=( )?-( )?D|8( )?-( )?D|8( )?D|x( )?-( )?D|x( )?D|X( )?-( )?D|=( )?-( )?D',
+        ' happyface emoji ', rep_text)
+    rep_text = re.sub(':( )?d|:( )?-d|>:d|=( )?3|=( )?-( )?3|:\'-\)|:\'\)|\(\':|\[:|:( )?\]',
+                      ' happyface emoji ', rep_text)    
+    rep_text = re.sub('\)+:|:\(+|:( )?-( )?\(+|\)+-:|>:\[| : c |:( )?-( )?\[', ' sadface emoji ', rep_text)
+    rep_text = re.sub(':( )?\*|:( )?-( )?\*+|:x', ' kissyface emoji ', rep_text, flags=re.I) 
+    rep_text = re.sub('<( )?3', ' heart emoji ', rep_text)
+    rep_text = re.sub(';( )?-( )?\)|;( )?\)|\*\)|\*-\)|;( )?-( )?\]|;( )?]|;( )?D|;\^\)', ' winkyface emoji ', rep_text)
+    rep_text = re.sub('>( )?:( )?P|:( )?-( )?P|:( )?P|X( )?-( )?P|x( )?p|=( )?p|:( )?b|:-b|;( )?p| : p ',
+                      ' tongue emoji ', rep_text, flags=re.I)
+    rep_text = re.sub('>:O|:( )?-( )?O|:( )?O', ' surprise emoji ', rep_text, flags=re.I) #done
     rep_text = re.sub(
-    ':-\||<:-\||>( )?.( )?<|:( )?-( )?\/|:( )?-( )?\\\\|:S|:( )?\/|=\/|=( )?\\\\|:( )?\\\\|:( )?-( )?s|;( )?/|:( )?l ',
-    ' skeptical_emoji ', rep_text) #done
+    '<:-\||>( )?.( )?<|:( )?-( )?\/|:( )?-( )?\\\\|:S|:( )?\/|=\/|=( )?\\\\|:( )?\\\\|:( )?-( )?s|;( )?/|:( )?l ',
+    ' skeptical emoji ', rep_text) #done
     return rep_text
 
 def represents_float(s):

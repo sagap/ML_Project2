@@ -17,10 +17,10 @@ def loadGloveModel(gloveFile):
     with open(gloveFile,'r') as f:
         lines = f.readlines()       
         word_embeddings = {}
-        for line in f:
+        for line in lines:
             word = line.split(' ', 1)[0]
             embedding_vector = np.array([float(x) for x in line.split(' ', 1)[1].split()])
-            word_embeddings[word] = embedding
+            word_embeddings[word] = embedding_vector
         return word_embeddings
     
 def fit_tokenizer(train_data, num_words):
